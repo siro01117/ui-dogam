@@ -272,7 +272,12 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
   .cart .ch .t .x{display:block}
   .cartbtn{display:inline-flex}
 }
-.mtab{display:none}
+.mtab,#mplat{display:none}
+.plb{position:absolute;top:8px;right:8px;font-size:11px;font-weight:600;line-height:1;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.9);color:#3A4150;box-shadow:0 1px 3px rgba(40,50,110,.12);pointer-events:none}
+.seg.plat{padding:2px;border-radius:10px}
+.seg.plat button{font-size:12.5px;padding:4px 10px}
+.bigplat{margin:10px 6px 4px;font-size:16px;line-height:1.6;color:var(--dim)}
+.bigplat b{display:inline-block;font-size:13px;font-weight:600;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:1px 10px;margin-right:8px}
 .ctiles{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;margin-bottom:26px}
 .ctile{border:1px solid var(--line);background:transparent;border-radius:16px;padding:6px 6px 10px;text-align:left;color:var(--fg);cursor:pointer;font:inherit}
 .ctile .cpic{display:block;border-radius:11px;overflow:hidden;pointer-events:none}
@@ -286,6 +291,13 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
   body[data-m="find"] header.top .logo,body[data-m="find"] #theme{display:none}
   body:not([data-m="find"]) header.top .search{display:none}
   header.top .bar{justify-content:space-between}
+  #mplat{display:block;margin-left:auto}
+  header.top .bar{flex-wrap:nowrap;gap:8px}
+  header.top .logo{min-width:0;flex:1}
+  header.top .logo>div{min-width:0}
+  header.top .logo b,header.top .logo small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .seg.plat button{padding:4px 8px}
+  body[data-m="find"] #mplat{display:none}
   header.top .search{max-width:none;flex:1}
   .search input{font-size:16px}
   .logo small{display:block}
@@ -342,6 +354,7 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
       <button id="pTeal" data-pal="teal" style="background:#0E9F96" title="청록" aria-label="청록" aria-pressed="false"></button>
       <button id="pLime" data-pal="lime" style="background:#D4F24A" title="라임" aria-label="라임" aria-pressed="false"></button>
     </div>
+    <div id="mplat"></div>
     <button class="ibtn" id="theme" aria-label="화면 밝기 전환"></button>
   </div>
 </header>
@@ -356,32 +369,33 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
   </main>
 </div>
 
-<script src="data.js"></script>
-<script src="alias.js"></script>
-<script src="thumbs.js"></script>
+<script src="data.js?v=1795036399"></script>
+<script src="alias.js?v=1795036399"></script>
+<script src="platform.js?v=1795036399"></script>
+<script src="thumbs.js?v=1795036399"></script>
 
 
-<script src="anim.js"></script>
-<script src="b2base.js"></script>
-<script src="b2_1.js"></script>
-<script src="b2_2.js"></script>
-<script src="b2_3.js"></script>
-<script src="b2_4.js"></script>
-<script src="b2_5.js"></script>
-<script src="b2_6.js"></script>
-<script src="b2_7.js"></script>
-<script src="b2_8.js"></script>
-<script src="b2_9.js"></script>
-<script src="b2_10.js"></script>
-<script src="b2_11.js"></script>
-<script src="b2_12.js"></script>
-<script src="b2_13.js"></script>
-<script src="b2_14.js"></script>
-<script src="b2_15.js"></script>
-<script src="b2_16.js"></script>
-<script src="b2_17.js"></script>
-<script src="b2_18.js"></script>
-<script src="b2_19.js"></script>
-<script src="b2_20.js"></script>
-<script src="b2_21.js"></script>
-<script src="app.js"></script>
+<script src="anim.js?v=1795036399"></script>
+<script src="b2base.js?v=1795036399"></script>
+<script src="b2_1.js?v=1795036399"></script>
+<script src="b2_2.js?v=1795036399"></script>
+<script src="b2_3.js?v=1795036399"></script>
+<script src="b2_4.js?v=1795036399"></script>
+<script src="b2_5.js?v=1795036399"></script>
+<script src="b2_6.js?v=1795036399"></script>
+<script src="b2_7.js?v=1795036399"></script>
+<script src="b2_8.js?v=1795036399"></script>
+<script src="b2_9.js?v=1795036399"></script>
+<script src="b2_10.js?v=1795036399"></script>
+<script src="b2_11.js?v=1795036399"></script>
+<script src="b2_12.js?v=1795036399"></script>
+<script src="b2_13.js?v=1795036399"></script>
+<script src="b2_14.js?v=1795036399"></script>
+<script src="b2_15.js?v=1795036399"></script>
+<script src="b2_16.js?v=1795036399"></script>
+<script src="b2_17.js?v=1795036399"></script>
+<script src="b2_18.js?v=1795036399"></script>
+<script src="b2_19.js?v=1795036399"></script>
+<script src="b2_20.js?v=1795036399"></script>
+<script src="b2_21.js?v=1795036399"></script>
+<script src="app.js?v=1795036399"></script>

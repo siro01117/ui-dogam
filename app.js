@@ -13,23 +13,29 @@ const seen=new Set();
 const D=RAW.trim().split("\n").map((l,i)=>{const[k,e,c,d,p]=l.split("|");const key=seen.has(k)?c+":"+k:k;seen.add(k);
   const t={id:"t"+i,key,k,e,c,d,p,g:ETC.includes(c)?"etc":"ui",ch:cho(k).replace(/\s/g,"")};t.anim=look(ANIM_,t);return t});
 const byKey={};D.forEach(t=>byKey[t.key]=t);
+// 모바일 · 웹 표시: pl = m(모바일) · w(웹) · b(공용), pd = 모바일과 웹에서 다른 점
+{const P=typeof PLAT!=="undefined"?PLAT:{m:[],w:[],diff:{}},M=new Set(P.m),W=new Set(P.w),has=(set,t)=>set.has(t.c+":"+t.k)||(t.key===t.k&&set.has(t.k));
+ D.forEach(t=>{t.pl=has(M,t)?"m":has(W,t)?"w":"b";t.pd=t.key===t.k?P.diff[t.k]||"":""});}
+const PLN={m:"모바일",w:"웹"};
 
-const S={grp:"all",q:"",pal:"blue",theme:"",fav:[],only:false,zoom:1,mtab:"cat",mcat:null};
+const S={grp:"all",q:"",pal:"blue",theme:"",fav:[],only:false,zoom:1,plat:"all",mtab:"cat",mcat:null};
 const ZOOM=[140,180,240,320,420];   // 카드 최소 폭(px): 작게 → 크게
 const store={get(k){try{return localStorage.getItem("dogam-"+k)}catch(e){return null}},set(k,v){try{localStorage.setItem("dogam-"+k,v)}catch(e){}}};
 const save=(k,v)=>{store.set(k,v);window.dogam.onChange&&window.dogam.onChange(k,v)};
 function applySaved(o){
   if(o.pal)S.pal=o.pal;if(o.theme==="light"||o.theme==="dark")S.theme=o.theme;
+  if(o.plat==="m"||o.plat==="w"||o.plat==="all")S.plat=o.plat;
   if(o.zoom!==undefined&&o.zoom!==null&&ZOOM[+o.zoom])S.zoom=+o.zoom;
   if(o.fav){try{const a=JSON.parse(o.fav);if(Array.isArray(a))S.fav=a.filter(k=>byKey[k])}catch(e){}}
 }
 window.dogam={onChange:null,apply(o){applySaved(o);render()}};
-applySaved({pal:store.get("pal"),theme:store.get("theme"),fav:store.get("fav"),zoom:store.get("zoom")});
+applySaved({pal:store.get("pal"),theme:store.get("theme"),fav:store.get("fav"),zoom:store.get("zoom"),plat:store.get("plat")});
 
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const norm=s=>s.toLowerCase().replace(/\s/g,"");
 const isFav=k=>S.fav.includes(k);
+const platOk=t=>S.plat==="all"||t.pl==="b"||t.pl===S.plat;
 // 찾기: 이름 · 영어 · 검색어(생김새 말 · 별칭) · 뜻 · 분류에서 찾아 잘 맞는 순으로. 이름이 맞으면 맨 앞
 D.forEach(t=>{const al=look(AL,t)||"";t.nk=norm(t.k);t.ne=norm(t.e);t.na=norm(al);t.ali=al.split(",").map(norm);t.nd=norm(t.d+CATS[t.c]);t.lat=(t.e+" , "+al).toLowerCase()});
 // 낱말 하나가 어디에 맞는지: 이름 4 · 영어 3 · 검색어 2 · 뜻 1 · 없음 0. 영어 한두 글자는 낱말째로만 맞춘다(ai 가 thumbnail 에 걸리지 않게)
@@ -48,7 +54,7 @@ function rank(t,n,ws){
   return sc;
 }
 function scope(){
-  const base=D.filter(t=>(S.q||S.only||S.grp==="all"||t.g===S.grp)&&(!S.only||isFav(t.key)));
+  const base=D.filter(t=>platOk(t)&&(S.q||S.only||S.grp==="all"||t.g===S.grp)&&(!S.only||isFav(t.key)));
   if(!S.q)return base;
   const n=norm(S.q);
   if(/^[ㄱ-ㅎ]+$/.test(n))return base.filter(t=>t.ch.includes(n));
@@ -75,7 +81,7 @@ D.forEach(t=>{
 });
 const picHTML=t=>t.pic;
 const card=t=>`<article class="card${isFav(t.key)?" on":""}" id="${t.id}" data-key="${esc(t.key)}" tabindex="0" role="button" aria-label="${esc(t.k)} 크게 보기">
-  <div class="pic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<span class="pb mv" aria-hidden="true">${MOVE}</span>`:""}</div>
+  <div class="pic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<span class="pb mv" aria-hidden="true">${MOVE}</span>`:""}${t.pl!=="b"?`<span class="plb">${PLN[t.pl]}</span>`:""}</div>
   <div class="body"><div class="head"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div></div></article>`;
 
 // 지금 목록에 있는 분류만 상위 묶음별로
@@ -95,8 +101,9 @@ function applyTheme(){
   b.setAttribute("aria-label",dark?"밝은 화면으로":"어두운 화면으로");b.title=b.getAttribute("aria-label");
   b.innerHTML=dark?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
 }
+const platSeg=()=>`<div class="seg plat" role="group" aria-label="모바일 · 웹">${[["all","전체"],["m","모바일"],["w","웹"]].map(([k,n])=>`<button data-plat="${k}" aria-pressed="${S.plat===k}">${n}</button>`).join("")}</div>`;
 function renderFbar(){
-  $("#fbar").innerHTML=`<button class="chip only" data-only="1" aria-pressed="${S.only}">${FAVI.replace("<svg",`<svg width="14" height="14" fill="${S.only?"currentColor":"none"}"`)}즐겨찾기만<span>${S.fav.length}</span></button><span class="sp"></span><div class="zoom" role="group" aria-label="카드 크기"><button data-z="-1" ${S.zoom?"":"disabled"} aria-label="작게" title="작게 ( - )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12"/></svg></button><span>${S.zoom+1}/${ZOOM.length}</span><button data-z="1" ${S.zoom<ZOOM.length-1?"":"disabled"} aria-label="크게" title="크게 ( + )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12M12 6v12"/></svg></button></div>`;
+  $("#fbar").innerHTML=`<button class="chip only" data-only="1" aria-pressed="${S.only}">${FAVI.replace("<svg",`<svg width="14" height="14" fill="${S.only?"currentColor":"none"}"`)}즐겨찾기만<span>${S.fav.length}</span></button>${platSeg()}<span class="sp"></span><div class="zoom" role="group" aria-label="카드 크기"><button data-z="-1" ${S.zoom?"":"disabled"} aria-label="작게" title="작게 ( - )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12"/></svg></button><span>${S.zoom+1}/${ZOOM.length}</span><button data-z="1" ${S.zoom<ZOOM.length-1?"":"disabled"} aria-label="크게" title="크게 ( + )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12M12 6v12"/></svg></button></div>`;
   document.documentElement.style.setProperty("--cw",ZOOM[S.zoom]+"px");
 }
 // 좁은 화면(모바일): 아래 탭 바 = 분류 / 찾기 / 즐겨찾기. 분류 탭은 분류 목록 → 그 분류 카드
@@ -106,15 +113,16 @@ const MT={cat:["카테고리",'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 
 document.body.insertAdjacentHTML("beforeend",`<nav class="mtab" id="mtab" aria-label="보기"></nav>`);
 function renderMobile(){
   document.body.dataset.m=S.mtab;
+  $("#mplat").innerHTML=platSeg();
   $("#mtab").innerHTML=Object.keys(MT).map(k=>`<button data-mtab="${k}" aria-pressed="${S.mtab===k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round">${MT[k][1]}</svg>${MT[k][0]}${k==="fav"&&S.fav.length?`<i>${S.fav.length}</i>`:""}</button>`).join("");
   $("#count").textContent=S.mtab==="fav"?`즐겨찾기 ${S.fav.length}개`:`${D.length}개 · 모양으로 이름 찾기`;
   const g0=S.grp;S.grp="all";S.only=S.mtab==="fav";if(S.mtab!=="find"&&S.q){S.q="";$("#q").value=""}
   let html="",m="";
   if(S.mtab==="cat"&&!S.mcat){
-    html=SUP.map(([id,name,cs])=>`<div class="supsec"><div class="suphead">${name}</div><div class="ctiles">${cs.map(c=>{const ts=D.filter(t=>t.c===c);if(!ts.length)return"";
+    html=SUP.map(([id,name,cs])=>`<div class="supsec"><div class="suphead">${name}</div><div class="ctiles">${cs.map(c=>{const ts=D.filter(t=>t.c===c&&platOk(t));if(!ts.length)return"";
       return `<button class="ctile" data-mcat="${c}"><span class="cpic">${ts[0].pic}</span><b>${CATS[c]}</b><small>${ts.length}</small></button>`}).join("")}</div></div>`).join("");
   }else if(S.mtab==="cat"){
-    const ts=D.filter(t=>t.c===S.mcat);
+    const ts=D.filter(t=>t.c===S.mcat&&platOk(t));
     html=`<button class="mback" data-mcat=""><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg>카테고리</button><section class="catsec" id="C-${S.mcat}"><h2>${CATS[S.mcat]}<span>${ts.length}</span></h2><div class="grid">${ts.map(card).join("")}</div></section>`;
   }else{
     const list=scope();
@@ -177,7 +185,7 @@ function openView(k){
   const first=$("#dlg").hidden;
   if(first){lastFocus=document.activeElement;try{history.pushState({v:1},"")}catch(e){}}
   viewKey=k;
-  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div><div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}`;
+  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div><div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}${t.g==="ui"?`<p class="bigplat"><b>${t.pl==="b"?"모바일 · 웹 공용":PLN[t.pl]+"에서 주로 써요"}</b>${t.pd?esc(t.pd):""}</p>`:""}`;
   fitThc($("#dlgBody"));
   $("#dlg").hidden=false;document.body.style.overflow="hidden";
   if(first){$(".dlgbox").scrollTop=0;$(".dlgbox").focus()}
@@ -233,6 +241,7 @@ document.addEventListener("click",e=>{
     render();window.scrollTo(0,0);return}
   if(d.step){stepView(+d.step);return}
   if(b.id==="dlgX"){closeView();return}
+  if(d.plat){S.plat=d.plat;save("plat",S.plat);render();return}
   if(d.z){setZoom(S.zoom+(+d.z));return}
   if(d.only){S.only=!S.only;render();window.scrollTo({top:0});return}
   if(d.g){S.grp=d.g;S.q="";S.only=false;$("#q").value="";render();window.scrollTo({top:0});return}
