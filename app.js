@@ -18,7 +18,7 @@ const byKey={};D.forEach(t=>byKey[t.key]=t);
  D.forEach(t=>{t.pl=has(M,t)?"m":has(W,t)?"w":"b";t.pd=t.key===t.k?P.diff[t.k]||"":""});}
 const PLN={m:"모바일",w:"웹"};
 
-const S={grp:"all",q:"",pal:"blue",theme:"",fav:[],only:false,zoom:1,plat:"all",mtab:"cat",mcat:null};
+const S={grp:"all",q:"",pal:"blue",theme:"light",fav:[],only:false,zoom:1,plat:"all",mtab:"cat",mcat:null};
 const ZOOM=[140,180,240,320,420];   // 카드 최소 폭(px): 작게 → 크게
 const store={get(k){try{return localStorage.getItem("dogam-"+k)}catch(e){return null}},set(k,v){try{localStorage.setItem("dogam-"+k,v)}catch(e){}}};
 const save=(k,v)=>{store.set(k,v);window.dogam.onChange&&window.dogam.onChange(k,v)};
