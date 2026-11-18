@@ -1,5 +1,5 @@
 // UI 이름 도감 데이터. 출처: @uxwoodytips 릴스 52개 캡션 + 표준 용어 보충(+)
-const CATS={ct:"버튼",in:"폼 · 입력",nv:"내비게이션",ov:"오버레이 · 알림",ic:"아이콘",ly:"레이아웃",pg:"페이지 섹션",sc:"스크린",sr:"검색 · 필터",dt:"데이터 · 차트",sh:"공유",ai:"AI 채팅",fb:"상태 · 피드백",mo:"모션 · 트랜지션",ge:"제스처",st:"디자인 스타일 · 시스템",ty:"폰트 스타일",tf:"폰트 분류",ta:"폰트 아나토미",tp:"타이포그래피",ps:"UX 심리 · 법칙",rs:"UX 리서치 · 설계"};
+const CATS={ct:"버튼",in:"폼 · 입력",nv:"내비게이션",ov:"오버레이 · 알림",ic:"아이콘",ly:"레이아웃",pg:"페이지 섹션",sc:"스크린",sr:"검색 · 필터",dt:"데이터 · 차트",sh:"공유",fb:"상태 · 피드백",mo:"모션 · 트랜지션",ge:"제스처",st:"디자인 스타일 · 시스템",ty:"폰트 스타일",tf:"폰트 분류",ta:"폰트 아나토미",tp:"타이포그래피",ps:"UX 심리 · 법칙",rs:"UX 리서치 · 설계"};
 // 이름|English|분류|뜻|헷갈리는 짝|출처(+ = 보충)
 const RAW=`팝업|Popup|ov|화면 위에 뜨는 창을 통틀어 부르는 말|모달|11/18
 모달|Modal|ov|뒤를 막고, 닫기 전엔 다른 곳을 못 누르는 창. 꼭 답해야 할 때만|바텀시트|11/18
@@ -201,13 +201,13 @@ NPS 점수|NPS (0–10)|dt|0부터 10까지 추천 의향 고르기||11/4
 리포스트|Repost|sh|내 피드에 다시 올리기||11/6
 QR 공유|QR share|sh|코드로 열게 하기||11/6
 근처 공유|Nearby share / AirDrop|sh|주변 기기로 보내기||11/6
-생각 중 표시|Thinking indicator|ai|답을 만드는 중이라는 표시||10/29
-스트리밍 답변|Streaming response|ai|답이 글자 단위로 흘러나옴||10/29
-추천 질문 칩|Suggested prompts|ai|눌러서 바로 물어보는 질문 칩||10/29
-입력창|Composer|ai|메시지를 쓰는 아래 칸과 보내기 버튼||+
-중지 버튼|Stop generating|ai|답 생성을 멈추기||+
-다시 생성|Regenerate|ai|같은 질문에 답을 새로 받기||+
-출처 표시|Citations|ai|답에 붙은 근거 링크 번호||+
+생각 중 표시|Thinking indicator|fb|답을 만드는 중이라는 표시||10/29
+스트리밍 답변|Streaming response|fb|답이 글자 단위로 흘러나옴||10/29
+추천 질문 칩|Suggested prompts|in|눌러서 바로 물어보는 질문 칩||10/29
+입력창|Composer|in|메시지를 쓰는 아래 칸과 보내기 버튼||+
+중지 버튼|Stop generating|ct|답 생성을 멈추기||+
+다시 생성|Regenerate|ct|같은 질문에 답을 새로 받기||+
+출처 표시|Citations|ly|답에 붙은 근거 링크 번호||+
 플랫|Flat design|st|그림자·질감 없이 평평한 면||11/4
 스큐어모피즘|Skeuomorphism|st|진짜 종이·가죽처럼 보이게|글래스모피즘|11/1
 글래스모피즘|Glassmorphism|st|뒤가 살짝 비치는 젖빛 유리|리퀴드 글래스|11/1
@@ -373,17 +373,17 @@ KPI 카드|KPI card / Stat card|dt|핵심 숫자 하나를 크게 보여 주는 
 초대 링크|Invite link|sh|받은 사람이 누르면 모임이나 방에 바로 들어오는 주소|링크 복사|+
 임베드|Embed|sh|다른 곳의 영상 · 글을 내 페이지 안에 그대로 끼워 넣기|링크 미리보기 카드|+
 공유 권한 설정|Share permissions|sh|사람마다 보기만 · 편집까지 중 어디까지 되는지 정하는 곳|초대 링크|+
-말풍선|Chat bubble|ai|주고받는 말 하나하나를 담는 둥근 상자. 내 말은 오른쪽|입력창|+
-답변 평가|Thumbs up / down|ai|답변이 좋았는지 엄지 위 · 아래로 알려 주는 버튼|하트|+
-복사 버튼|Copy button|ai|답변 글을 통째로 복사하는 버튼|링크 복사|+
-모델 선택|Model selector|ai|어떤 AI 모델로 답할지 고르는 펼침 목록|드롭다운|+
-파일 첨부|File attachment|ai|입력창에 문서 · 사진을 붙여 함께 보내기. 붙이면 칩으로 보인다|첨부|+
-음성 입력|Voice input|ai|마이크를 눌러 말로 입력하기. 말하는 동안 소리 물결이 보인다|입력창|+
-대화 목록|Conversation list|ai|지난 대화가 쌓여 있는 옆 목록. 눌러서 이어 간다|드로어|+
-캔버스 패널|Canvas / Artifact panel|ai|긴 글 · 코드 결과를 대화 옆에 따로 펼쳐 보여 주는 판|코드 블록|+
-코드 블록|Code block|ai|답변 속 코드를 어두운 상자에 따로 담은 것. 복사 버튼이 붙는다|캔버스 패널|+
-도구 사용 표시|Tool call indicator|ai|AI가 검색 · 파일 읽기 같은 일을 하는 중임을 보여 주는 줄|생각 중 표시|+
-수정 후 다시 보내기|Edit and resend|ai|보낸 질문을 고쳐서 다시 보내면 답도 새로 나온다|다시 생성|+
+말풍선|Chat bubble|ly|주고받는 말 하나하나를 담는 둥근 상자. 내 말은 오른쪽|입력창|+
+답변 평가|Thumbs up / down|ct|답변이 좋았는지 엄지 위 · 아래로 알려 주는 버튼|하트|+
+복사 버튼|Copy button|ct|답변 글을 통째로 복사하는 버튼|링크 복사|+
+모델 선택|Model selector|in|어떤 AI 모델로 답할지 고르는 펼침 목록|드롭다운|+
+파일 첨부|File attachment|in|입력창에 문서 · 사진을 붙여 함께 보내기. 붙이면 칩으로 보인다|첨부|+
+음성 입력|Voice input|in|마이크를 눌러 말로 입력하기. 말하는 동안 소리 물결이 보인다|입력창|+
+대화 목록|Conversation list|ly|지난 대화가 쌓여 있는 옆 목록. 눌러서 이어 간다|드로어|+
+캔버스 패널|Canvas / Artifact panel|ly|긴 글 · 코드 결과를 대화 옆에 따로 펼쳐 보여 주는 판|코드 블록|+
+코드 블록|Code block|ly|답변 속 코드를 어두운 상자에 따로 담은 것. 복사 버튼이 붙는다|캔버스 패널|+
+도구 사용 표시|Tool call indicator|fb|AI가 검색 · 파일 읽기 같은 일을 하는 중임을 보여 주는 줄|생각 중 표시|+
+수정 후 다시 보내기|Edit and resend|ct|보낸 질문을 고쳐서 다시 보내면 답도 새로 나온다|다시 생성|+
 머티리얼 디자인|Material Design|st|구글이 만든 디자인 체계. 그림자로 뜬 면과 물결 반응, 둥근 FAB가 특징|플랫|+
 다크 모드|Dark mode|st|바탕은 어둡게, 글자는 밝게 바꾼 화면. 밤에 눈이 덜 부심||+
 메시 그라데이션|Mesh gradient|st|여러 색이 얼룩처럼 사방에서 번져 섞이는 배경|오로라 배경|+
@@ -507,17 +507,17 @@ PIP|Picture-in-picture|ov|영상을 작은 창으로 띄워 다른 일을 하면
 스토리 공유|Share to story|sh|보던 글 · 노래를 내 스토리에 스티커처럼 얹어 올리기|공유용 카드|+
 공유용 카드|Share card|sh|기록 · 결과를 보기 좋은 그림 한 장으로 만들어 저장 · 공유하게 하는 카드|링크 미리보기 카드|+
 협업자 아바타 스택|Collaborator avatar stack|sh|같이 보고 있는 사람들 얼굴을 겹쳐 놓은 줄. 넘치면 +3 으로 줄인다|아바타|+
-추론 펼치기|Reasoning disclosure|ai|답 위의 접힌 줄을 누르면 AI가 생각한 과정이 펼쳐진다|생각 중 표시|+
-프롬프트 템플릿|Prompt template|ai|빈칸만 채우면 되게 미리 짜 둔 질문 틀|추천 질문 칩|+
-톤 · 길이 조절|Tone / length controls|ai|답을 더 짧게 · 길게, 말투를 바꿔 달라고 고르는 버튼들|다시 생성|+
-이미지 결과 그리드|Image result grid|ai|만든 그림 여러 장을 격자로 보여 주고 하나를 고르게 한다|그리드|+
-대화 분기|Conversation branching|ai|질문을 고치면 답이 갈래로 나뉘고, 2/3 화살표로 오간다|수정 후 다시 보내기|+
-메모리 표시|Memory indicator|ai|AI가 내 정보를 기억해 뒀거나 꺼내 썼다고 알리는 작은 표시||+
-한도 안내|Usage limit notice|ai|쓸 수 있는 양을 다 썼고 언제 다시 풀리는지 알리는 띠|페이월|+
-음성 모드|Voice mode|ai|입력창 없이 움직이는 공을 보며 말로만 주고받는 화면|음성 입력|+
-에이전트 진행 단계|Agent step progress|ai|AI가 맡은 일을 단계 목록으로 보여 주고 끝난 것부터 체크한다|도구 사용 표시|+
-승인 요청|Approval request|ai|AI가 파일 삭제 · 실행 같은 일을 하기 전에 해도 되는지 묻는 카드|컨펌|+
-변경 비교|Diff view|ai|고친 곳을 지운 줄은 빨강, 넣은 줄은 초록으로 보여 준다|코드 블록|+
+추론 펼치기|Reasoning disclosure|ly|답 위의 접힌 줄을 누르면 AI가 생각한 과정이 펼쳐진다|생각 중 표시|+
+프롬프트 템플릿|Prompt template|in|빈칸만 채우면 되게 미리 짜 둔 질문 틀|추천 질문 칩|+
+톤 · 길이 조절|Tone / length controls|in|답을 더 짧게 · 길게, 말투를 바꿔 달라고 고르는 버튼들|다시 생성|+
+이미지 결과 그리드|Image result grid|ly|만든 그림 여러 장을 격자로 보여 주고 하나를 고르게 한다|그리드|+
+대화 분기|Conversation branching|ly|질문을 고치면 답이 갈래로 나뉘고, 2/3 화살표로 오간다|수정 후 다시 보내기|+
+메모리 표시|Memory indicator|fb|AI가 내 정보를 기억해 뒀거나 꺼내 썼다고 알리는 작은 표시||+
+한도 안내|Usage limit notice|fb|쓸 수 있는 양을 다 썼고 언제 다시 풀리는지 알리는 띠|페이월|+
+음성 모드|Voice mode|sc|입력창 없이 움직이는 공을 보며 말로만 주고받는 화면|음성 입력|+
+에이전트 진행 단계|Agent step progress|fb|AI가 맡은 일을 단계 목록으로 보여 주고 끝난 것부터 체크한다|도구 사용 표시|+
+승인 요청|Approval request|ov|AI가 파일 삭제 · 실행 같은 일을 하기 전에 해도 되는지 묻는 카드|컨펌|+
+변경 비교|Diff view|ly|고친 곳을 지운 줄은 빨강, 넣은 줄은 초록으로 보여 준다|코드 블록|+
 자동 저장 표시|Autosave indicator|fb|저장을 누르지 않아도 저장됐다고 알려 주는 작은 글씨|저장 아이콘|+
 재시도 버튼|Retry button|fb|실패했을 때 같은 일을 한 번 더 해 보는 버튼|당겨서 새로고침|+
 드래그 핸들|Drag handle|ct|잡고 끌어서 순서를 바꾸는 점 여섯 개 손잡이|햄버거 메뉴|+
