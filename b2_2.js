@@ -58,9 +58,9 @@ TH2["아코디언"]=K=>K.card(16,8,128,84,14)
 TH2["상단 바"]=K=>K.card(8,8,144,28,12)+K.icon("back",22,22,12,C.ink,2)+K.txt(80,25.5,"주문 내역",{size:9,w:700,a:"middle"})+K.icon("search",138,22,11,C.ink,1.8)
   +K.blk(8,44,144,22,11)+K.blk(8,72,144,22,11);
 
-TH2["탭 바"]=K=>K.blk(16,12,128,46,14)
-  +K.card(18,68,124,24,12)+K.rect(22,72,40,16,{f:C.soft,r:8})+K.icon("home",33,80,10,C.blue,1.8)+K.txt(41,83,"홈",{size:7.5,fill:C.blue,w:700})
-  +K.icon("search",80,80,10,C.mute,1.8)+K.icon("bookmark",104,80,10,C.mute,1.8)+K.icon("user",128,80,10,C.mute,1.8);
+TH2["탭 바"]=K=>K.blk(16,10,128,24,12)+K.blk(16,40,128,20,10)
+  +K.rect(0,68,160,32,{f:C.sf,fx:"url(#b2lift)"})+K.line(0,68,160,68,{s:C.hair,sw:.6})
+  +[["home","홈"],["search","검색"],["bookmark","저장"],["user","내 정보"]].map(([ic,lb],i)=>K.icon(ic,20+i*40,79,11,i?C.mute:C.blue,1.8)+K.txt(20+i*40,94,lb,{size:7,fill:i?C.mute:C.blue,w:i?500:700,a:"middle"})).join("");
 
 TH2["탭"]=K=>K.card(10,10,140,80,14)
   +K.txt(35,30,"정보",{size:8.5,fill:C.blue,w:700,a:"middle"})+K.txt(80,30,"리뷰",{size:8.5,fill:C.mute,a:"middle"})+K.txt(125,30,"문의",{size:8.5,fill:C.mute,a:"middle"})

@@ -1,7 +1,7 @@
 // UI 이름 도감 — 어떤 모양이 어떤 이름인지. 그림 + 이름 + 즐겨찾기 (data.js · thumbs.js · anim.js 다음에 읽는다)
-const ETC=["st","ty","tp","ps","rs"];
+const ETC=["st","ty","tf","ta","tp","ps","rs"];
 // 상위 묶음: 사이드바와 본문에서 구분선으로만 나눈다. 분류 순서도 이 순서를 따른다
-const SUP=[["parts","부품",["ct","in","nv","ov","ic"]],["screen","화면 · 구성",["ly","pg","sc","sr","dt","sh","ai"]],["act","동작 · 반응",["fb","mo","ge"]],["style","스타일 · 글자",["st","ty","tp"]],["know","심리 · 리서치",["ps","rs"]]];
+const SUP=[["parts","컴포넌트",["ct","in","nv","ov","ic"]],["screen","레이아웃 · 스크린",["ly","pg","sc","sr","dt","sh","ai"]],["act","인터랙션",["fb","mo","ge"]],["style","스타일 · 폰트",["st","ty","tf","ta","tp"]],["know","UX",["ps","rs"]]];
 {const used=SUP.flatMap(s=>s[2]);Object.keys(CATS).forEach(c=>{if(!used.includes(c))SUP[SUP.length-1][2].push(c)})}
 const GRP={all:"전체",ui:"UI",etc:"기타"};
 const AL=typeof ALIAS!=="undefined"?ALIAS:{};
@@ -13,11 +13,6 @@ const seen=new Set();
 const D=RAW.trim().split("\n").map((l,i)=>{const[k,e,c,d,p]=l.split("|");const key=seen.has(k)?c+":"+k:k;seen.add(k);
   const t={id:"t"+i,key,k,e,c,d,p,g:ETC.includes(c)?"etc":"ui",ch:cho(k).replace(/\s/g,"")};t.anim=look(ANIM_,t);return t});
 const byKey={};D.forEach(t=>byKey[t.key]=t);
-// 헷갈리는 짝: 서로 가리키게 묶어 둔다 (크게 보기 창에서 나란히 보여 줌)
-const SIM={};
-{const byName={};D.forEach(t=>(byName[t.k]=byName[t.k]||[]).push(t));
- const link=(a,b)=>{if(a===b)return;const l=SIM[a.key]=SIM[a.key]||[];if(!l.includes(b))l.push(b)};
- D.forEach(t=>{const cs=t.p&&byName[t.p];if(!cs)return;const o=cs.find(x=>x.c===t.c)||cs[0];link(t,o);link(o,t)});}
 
 const S={grp:"all",q:"",pal:"blue",theme:"",fav:[],only:false,zoom:1,mtab:"cat",mcat:null};
 const ZOOM=[140,180,240,320,420];   // 카드 최소 폭(px): 작게 → 크게
@@ -29,25 +24,39 @@ function applySaved(o){
   if(o.fav){try{const a=JSON.parse(o.fav);if(Array.isArray(a))S.fav=a.filter(k=>byKey[k])}catch(e){}}
 }
 window.dogam={onChange:null,apply(o){applySaved(o);render()}};
-applySaved({grp:store.get("grp"),pal:store.get("pal"),theme:store.get("theme"),fav:store.get("fav"),zoom:store.get("zoom")});
+applySaved({pal:store.get("pal"),theme:store.get("theme"),fav:store.get("fav"),zoom:store.get("zoom")});
 
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const norm=s=>s.toLowerCase().replace(/\s/g,"");
 const isFav=k=>S.fav.includes(k);
-// 찾기: 이름 · 영어 · 뜻 · 분류 · 검색어(생김새 말 · 별칭)에서. 통째로 맞는 것 먼저, 없으면 낱말이 다 맞는 것, 그것도 없으면 절반 넘게 맞는 것
-D.forEach(t=>t.hay=norm(t.k+t.e+t.d+CATS[t.c]+(AL[t.key]||AL[t.k]||"")));
+// 찾기: 이름 · 영어 · 검색어(생김새 말 · 별칭) · 뜻 · 분류에서 찾아 잘 맞는 순으로. 이름이 맞으면 맨 앞
+D.forEach(t=>{const al=look(AL,t)||"";t.nk=norm(t.k);t.ne=norm(t.e);t.na=norm(al);t.ali=al.split(",").map(norm);t.nd=norm(t.d+CATS[t.c]);t.lat=(t.e+" , "+al).toLowerCase()});
+// 낱말 하나가 어디에 맞는지: 이름 4 · 영어 3 · 검색어 2 · 뜻 1 · 없음 0. 영어 한두 글자는 낱말째로만 맞춘다(ai 가 thumbnail 에 걸리지 않게)
+function wscore(t,w){
+  if(/^[a-z0-9]{1,2}$/.test(w))return new RegExp("(^|[^a-z0-9])"+w+"([^a-z0-9]|$)").test(t.lat)?3:0;
+  return t.nk.includes(w)?4:t.ne.includes(w)?3:t.na.includes(w)?2:t.nd.includes(w)?1:0;
+}
+function rank(t,n,ws){
+  let sc=0;
+  if(t.nk===n||t.ne===n)sc+=100;else if(t.nk.startsWith(n))sc+=70;
+  const p=wscore(t,n);if(p)sc+=50+p*10;
+  if(t.ali.includes(n))sc+=15;else if(t.ali.some(x=>x.startsWith(n)))sc+=8;
+  let hit=0;for(const w of ws){const x=wscore(t,w);if(x){hit++;sc+=x*(w.length>1?2:.5)}}
+  if(!p&&hit<ws.length){if(ws.length<2||hit<Math.ceil(ws.length/2))return 0;sc=hit*2+sc/10}
+  else if(!p)sc+=20;
+  return sc;
+}
 function scope(){
   const base=D.filter(t=>(S.q||S.only||S.grp==="all"||t.g===S.grp)&&(!S.only||isFav(t.key)));
   if(!S.q)return base;
   const n=norm(S.q);
   if(/^[ㄱ-ㅎ]+$/.test(n))return base.filter(t=>t.ch.includes(n));
   const ws=S.q.toLowerCase().split(/[\s,]+/).filter(Boolean);
-  const sc=t=>ws.filter(w=>t.hay.includes(w)).length;
-  let r=base.filter(t=>t.hay.includes(n));
-  if(!r.length)r=base.filter(t=>sc(t)===ws.length);
-  if(!r.length&&ws.length>1){const need=Math.ceil(ws.length/2);r=base.filter(t=>sc(t)>=need).sort((x,y)=>sc(y)-sc(x))}
-  return r;
+  let r=base.map(t=>[rank(t,n,ws),t]).filter(x=>x[0]>0).sort((x,y)=>y[0]-x[0]);
+  // 통째로 · 낱말 모두 맞는 게 있으면 절반만 맞는 것은 뺀다
+  if(r.length&&r[0][0]>=20){const cut=Math.max(20,r[0][0]*.35);r=r.filter(x=>x[0]>=cut)}
+  return r.map(x=>x[1]);
 }
 
 const FAVI='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 3.2l2.6 5.5 6 .7-4.5 4.1 1.2 5.9L12 16.5l-5.3 2.9 1.2-5.9-4.5-4.1 6-.7z"/></svg>';
@@ -65,8 +74,8 @@ D.forEach(t=>{
   else t.pic=thumbHTML(t);
 });
 const picHTML=t=>t.pic;
-const card=t=>`<article class="card${isFav(t.key)?" on":""}" id="${t.id}" data-key="${esc(t.key)}" tabindex="0" aria-label="${esc(t.k)} 크게 보기">
-  <div class="pic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<span class="pb mv" aria-hidden="true" title="올리면 움직여요">${MOVE}</span>`:""}</div>
+const card=t=>`<article class="card${isFav(t.key)?" on":""}" id="${t.id}" data-key="${esc(t.key)}" tabindex="0" role="button" aria-label="${esc(t.k)} 크게 보기">
+  <div class="pic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<span class="pb mv" aria-hidden="true">${MOVE}</span>`:""}</div>
   <div class="body"><div class="head"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div></div></article>`;
 
 // 지금 목록에 있는 분류만 상위 묶음별로
@@ -74,6 +83,7 @@ function groups(list){
   return SUP.map(([id,name,cs])=>{const on=cs.filter(c=>list.some(t=>t.c===c));
     return {id,name,cs:on,n:list.filter(t=>on.includes(t.c)).length}}).filter(g=>g.cs.length);
 }
+const flat=list=>`<section class="catsec"><div class="grid">${list.map(card).join("")}</div></section>`;
 function renderShelf(list,gs){
   return gs.map(g=>`<div class="supsec"><div class="suphead">${g.name}<span>${g.n}</span></div>`+(g.cs.map(c=>{const ts=list.filter(t=>t.c===c);
     return `<section class="catsec" id="C-${c}"><h2>${CATS[c]}<span>${ts.length}</span></h2><div class="grid">${ts.map(card).join("")}</div></section>`}).join(""))+`</div>`).join("");
@@ -92,28 +102,28 @@ function renderFbar(){
 // 좁은 화면(모바일): 아래 탭 바 = 분류 / 찾기 / 즐겨찾기. 분류 탭은 분류 목록 → 그 분류 카드
 const MQ=matchMedia("(max-width:760px)");
 const isM=()=>MQ.matches;
-const MT={cat:["분류",'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>'],find:["찾기",'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'],fav:["즐겨찾기",'<path d="M12 3.2l2.6 5.5 6 .7-4.5 4.1 1.2 5.9L12 16.5l-5.3 2.9 1.2-5.9-4.5-4.1 6-.7z"/>']};
+const MT={cat:["카테고리",'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>'],find:["검색",'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'],fav:["즐겨찾기",'<path d="M12 3.2l2.6 5.5 6 .7-4.5 4.1 1.2 5.9L12 16.5l-5.3 2.9 1.2-5.9-4.5-4.1 6-.7z"/>']};
 document.body.insertAdjacentHTML("beforeend",`<nav class="mtab" id="mtab" aria-label="보기"></nav>`);
 function renderMobile(){
   document.body.dataset.m=S.mtab;
   $("#mtab").innerHTML=Object.keys(MT).map(k=>`<button data-mtab="${k}" aria-pressed="${S.mtab===k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round">${MT[k][1]}</svg>${MT[k][0]}${k==="fav"&&S.fav.length?`<i>${S.fav.length}</i>`:""}</button>`).join("");
   $("#count").textContent=S.mtab==="fav"?`즐겨찾기 ${S.fav.length}개`:`${D.length}개 · 모양으로 이름 찾기`;
-  S.grp="all";S.only=S.mtab==="fav";if(S.mtab!=="find"&&S.q){S.q="";$("#q").value=""}
+  const g0=S.grp;S.grp="all";S.only=S.mtab==="fav";if(S.mtab!=="find"&&S.q){S.q="";$("#q").value=""}
   let html="",m="";
   if(S.mtab==="cat"&&!S.mcat){
     html=SUP.map(([id,name,cs])=>`<div class="supsec"><div class="suphead">${name}</div><div class="ctiles">${cs.map(c=>{const ts=D.filter(t=>t.c===c);if(!ts.length)return"";
       return `<button class="ctile" data-mcat="${c}"><span class="cpic">${ts[0].pic}</span><b>${CATS[c]}</b><small>${ts.length}</small></button>`}).join("")}</div></div>`).join("");
   }else if(S.mtab==="cat"){
     const ts=D.filter(t=>t.c===S.mcat);
-    html=`<button class="mback" data-mcat=""><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg>분류</button><section class="catsec" id="C-${S.mcat}"><h2>${CATS[S.mcat]}<span>${ts.length}</span></h2><div class="grid">${ts.map(card).join("")}</div></section>`;
+    html=`<button class="mback" data-mcat=""><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg>카테고리</button><section class="catsec" id="C-${S.mcat}"><h2>${CATS[S.mcat]}<span>${ts.length}</span></h2><div class="grid">${ts.map(card).join("")}</div></section>`;
   }else{
     const list=scope();
     if(S.q)m=`“${S.q}” ${list.length}개`;
-    html=list.length?renderShelf(list,groups(list)):`<p class="empty">${S.only?"아직 즐겨찾기한 게 없어요. 카드의 ☆를 눌러 보세요.":"찾는 이름이 없어요. 생김새나 영어, 초성으로도 찾아보세요."}</p>`;
+    html=list.length?(S.q?flat(list):renderShelf(list,groups(list))):`<p class="empty">${S.only?"아직 즐겨찾기한 게 없어요. 카드의 ☆를 눌러 보세요.":"찾는 이름이 없어요. 생김새나 영어, 초성으로도 찾아보세요."}</p>`;
   }
   $("#meta").textContent=m;$("#meta").hidden=!m;
   $("#out").innerHTML=html;
-  fitThc($("#out"));
+  fitThc($("#out"));S.grp=g0;
 }
 try{MQ.addEventListener("change",()=>{if(!isM()){delete document.body.dataset.m;S.only=false}render()})}catch(e){}
 function render(){
@@ -125,22 +135,23 @@ function render(){
   renderFbar();
   if(isM()){renderMobile();return}
   const list=scope();
-  const gs=groups(list);
-  $("#aisle").innerHTML=`<h3>${S.only?"즐겨찾기":S.q?"찾은 분류":GRP[S.grp]}</h3>`+gs.map(g=>`<div class="sup">${g.name}</div>`+(g.cs.map(c=>`<button data-jump="C-${c}">${CATS[c]}<span>${list.filter(t=>t.c===c).length}</span></button>`).join(""))).join("");
+  const gs=S.q?[]:groups(list);
+  $("#aisle").innerHTML=`<h3>${S.q?"검색 결과 "+list.length:S.only?"즐겨찾기":GRP[S.grp]}</h3>`+gs.map(g=>`<div class="sup">${g.name}</div>`+(g.cs.map(c=>`<button data-jump="C-${c}">${CATS[c]}<span>${list.filter(t=>t.c===c).length}</span></button>`).join(""))).join("");
   const m=S.q?`“${S.q}” ${list.length}개`:"";
   $("#meta").textContent=m;$("#meta").hidden=!m;
-  $("#out").innerHTML=list.length?renderShelf(list,gs):`<p class="empty">${S.only?"아직 즐겨찾기한 게 없어요. 카드의 ☆를 눌러 보세요.":"찾는 이름이 없어요. 영어나 초성으로도 찾아보세요."}</p>`;
+  $("#out").innerHTML=list.length?(S.q?flat(list):renderShelf(list,gs)):`<p class="empty">${S.only?"아직 즐겨찾기한 게 없어요. 카드의 ☆를 눌러 보세요.":"찾는 이름이 없어요. 생김새나 영어, 초성으로도 찾아보세요."}</p>`;
   observe();fitThc($("#out"));
 }
-// 스타일 견본(HTML)은 230px 폭 기준으로 만들어져 있어 그림 폭에 맞춰 통째로 키운다
-const roThc="ResizeObserver" in window?new ResizeObserver(es=>es.forEach(e=>e.target.style.setProperty("--z",(e.contentRect.width/230).toFixed(3)))):null;
+// 스타일 견본(HTML)은 270px 폭 기준으로 만들어져 있어 그림 폭에 맞춰 통째로 키운다
+const roThc="ResizeObserver" in window?new ResizeObserver(es=>es.forEach(e=>e.target.style.setProperty("--z",(e.contentRect.width/270).toFixed(3)))):null;
 function fitThc(root){if(roThc)root.querySelectorAll(".thc").forEach(el=>roThc.observe(el))}
 function toggleFav(k){
   const i=S.fav.indexOf(k);if(i<0)S.fav.push(k);else S.fav.splice(i,1);
   save("fav",JSON.stringify(S.fav));
-  if(S.only){render();return}
+  if(S.only&&$("#dlg").hidden){render();return}
+  if(S.only)favDirty=true;   // 크게 보는 중이면 목록은 닫을 때 다시 그린다
   if(isM()){const b=$('#mtab [data-mtab="fav"]');if(b){const i=b.querySelector("i");if(i)i.remove();if(S.fav.length)b.insertAdjacentHTML("beforeend",`<i>${S.fav.length}</i>`)}}
-  $$(`[data-fav="${CSS.escape(k)}"]`).forEach(b=>b.outerHTML=favBtn(byKey[k]));
+  $$(`[data-fav="${CSS.escape(k)}"]`).forEach(b=>{const on=isFav(k);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);b.querySelector("svg").setAttribute("fill",on?"currentColor":"none")});
   $$(`.card[data-key="${CSS.escape(k)}"]`).forEach(el=>el.classList.toggle("on",isFav(k)));
   renderFbar();
 }
@@ -153,8 +164,8 @@ function setZoom(z){
   if(anchor)window.scrollBy(0,anchor.getBoundingClientRect().top-y0);
 }
 // 크게 보기 창: 카드를 누르면 그림을 크게. ← → 로 지금 보이는 목록 안에서 옆 카드로
-document.body.insertAdjacentHTML("beforeend",`<div class="dlg view" id="dlg" role="dialog" aria-modal="true" aria-label="크게 보기" hidden><button class="nav prev" data-step="-1" aria-label="이전"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button><div class="dlgbox"><button class="x" id="dlgX" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div id="dlgBody"></div></div><button class="nav next" data-step="1" aria-label="다음"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button></div>`);
-let viewKey=null,lastFocus=null;
+document.body.insertAdjacentHTML("beforeend",`<div class="dlg view" id="dlg" role="dialog" aria-modal="true" aria-label="크게 보기" hidden><button class="nav prev" data-step="-1" aria-label="이전"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button><div class="dlgbox" tabindex="-1"><button class="x" id="dlgX" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button><div id="dlgBody"></div></div><button class="nav next" data-step="1" aria-label="다음"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button></div>`);
+let viewKey=null,lastFocus=null,favDirty=false;
 // 크게 보기에서 손가락으로: 좌우로 밀면 옆 카드, 맨 위에서 아래로 밀면 닫기
 {let x0=0,y0=0,top0=0;const dlg=$("#dlg");
  dlg.addEventListener("touchstart",e=>{const t=e.touches[0];x0=t.clientX;y0=t.clientY;top0=$(".dlgbox").scrollTop},{passive:true});
@@ -163,17 +174,26 @@ let viewKey=null,lastFocus=null;
    else if(dy>110&&dy>Math.abs(dx)*1.5&&top0<=0)closeView()},{passive:true});}
 function openView(k){
   const t=byKey[k];if(!t)return;
-  if($("#dlg").hidden)lastFocus=document.activeElement;
+  const first=$("#dlg").hidden;
+  if(first){lastFocus=document.activeElement;try{history.pushState({v:1},"")}catch(e){}}
   viewKey=k;
-  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div><div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}`+simHTML(t);
+  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div><div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}`;
   fitThc($("#dlgBody"));
   $("#dlg").hidden=false;document.body.style.overflow="hidden";
+  if(first){$(".dlgbox").scrollTop=0;$(".dlgbox").focus()}
 }
-function simHTML(t){
-  const l=(SIM[t.key]||[]).slice(0,3);if(!l.length)return"";
-  return `<div class="sim"><h4>헷갈리기 쉬운 것</h4><div class="simrow">${l.map(o=>`<div class="simc" role="button" tabindex="0" data-view="${esc(o.key)}"><span class="simpic">${o.pic}</span><b>${esc(o.k)}</b><small>${esc(o.d)}</small></div>`).join("")}</div></div>`;
+function closeView(fromPop){
+  if($("#dlg").hidden)return;
+  $("#dlg").hidden=true;$("#dlgBody").innerHTML="";document.body.style.overflow="";viewKey=null;
+  if(favDirty){favDirty=false;render()}
+  if(lastFocus&&document.contains(lastFocus)&&lastFocus.focus)lastFocus.focus();
+  if(!fromPop){try{if(history.state&&history.state.v)history.back()}catch(e){}}
 }
-function closeView(){if($("#dlg").hidden)return;$("#dlg").hidden=true;$("#dlgBody").innerHTML="";document.body.style.overflow="";viewKey=null;lastFocus&&lastFocus.focus&&lastFocus.focus()}
+// 폰 뒤로가기: 크게 보기 닫기 → 분류 안에서 분류 목록으로
+addEventListener("popstate",()=>{
+  if(!$("#dlg").hidden){closeView(true);return}
+  if(isM()&&S.mcat&&!(history.state&&history.state.c)){S.mcat=null;render();scrollTo(0,0)}
+});
 function stepView(d){const ks=[...$$("#out .card")].map(c=>c.dataset.key);const i=ks.indexOf(viewKey);if(i<0||!ks.length)return;openView(ks[(i+d+ks.length)%ks.length])}
 document.addEventListener("click",e=>{
   if(e.target.closest("button"))return;
@@ -202,13 +222,15 @@ document.addEventListener("mouseover",e=>{
 });
 document.addEventListener("scroll",hideTip,{passive:true});
 document.addEventListener("mousedown",hideTip);
-document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.activeElement.matches("#out .card")){openView(document.activeElement.dataset.key)}else if(e.key==="Enter"&&document.activeElement.matches("[data-view]")){openView(document.activeElement.dataset.view)}});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&document.activeElement.matches("#out .card")){e.preventDefault();openView(document.activeElement.dataset.key)}});
 document.addEventListener("click",e=>{
-  const v=e.target.closest("[data-view]");if(v){openView(v.dataset.view);$(".dlgbox").scrollTop=0;return}
   const b=e.target.closest("button");if(!b)return;const d=b.dataset;
   if(d.fav){toggleFav(d.fav);return}
   if(d.mtab){S.mtab=d.mtab;S.mcat=null;render();window.scrollTo(0,0);if(d.mtab==="find")$("#q").focus();return}
-  if("mcat" in d){S.mcat=d.mcat||null;render();window.scrollTo(0,0);return}
+  if("mcat" in d){
+    if(d.mcat){S.mcat=d.mcat;try{history.pushState({c:d.mcat},"")}catch(e){}}
+    else{S.mcat=null;try{if(history.state&&history.state.c){history.back();return}}catch(e){}}
+    render();window.scrollTo(0,0);return}
   if(d.step){stepView(+d.step);return}
   if(b.id==="dlgX"){closeView();return}
   if(d.z){setZoom(S.zoom+(+d.z));return}
@@ -219,10 +241,13 @@ document.addEventListener("click",e=>{
   if(d.replay){const s=b.parentNode.querySelector("svg");s.replaceWith(s.cloneNode(true));return}
   if(b.id==="theme"){S.theme=isDark()?"light":"dark";save("theme",S.theme);applyTheme();return}
 });
-$("#q").addEventListener("input",e=>{S.q=e.target.value.trim();render()});
+{let qt=null;$("#q").addEventListener("input",e=>{clearTimeout(qt);const v=e.target.value.trim();qt=setTimeout(()=>{S.q=v;render();scrollTo(0,0)},130)})}
 document.addEventListener("keydown",e=>{
   if(!$("#dlg").hidden){
-    if(e.key==="Escape")closeView();else if(e.key==="ArrowLeft")stepView(-1);else if(e.key==="ArrowRight")stepView(1);else if(e.key.toLowerCase()==="f"&&viewKey)toggleFav(viewKey);
+    if(e.key==="Escape")closeView();
+    else if(e.key==="Tab"){const fs=[...$$("#dlg button")].filter(b=>b.offsetParent),i=fs.indexOf(document.activeElement);e.preventDefault();if(fs.length)fs[(i+(e.shiftKey?-1:1)+fs.length)%fs.length].focus()}
+    else if(e.ctrlKey||e.metaKey||e.altKey)return;
+    else if(e.key==="ArrowLeft")stepView(-1);else if(e.key==="ArrowRight")stepView(1);else if(e.key.toLowerCase()==="f"&&viewKey)toggleFav(viewKey);
     return;
   }
   if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)||e.ctrlKey||e.metaKey||e.altKey)return;
@@ -232,12 +257,13 @@ document.addEventListener("keydown",e=>{
   if(e.key==="="||e.key==="+")setZoom(S.zoom+1);
 });
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyTheme)}catch(e){}
-// 움직이는 그림은 보일 때만 돌고, 스크롤 위치에 맞춰 왼쪽 분류 표시
+// 스크롤 위치에 맞춰 왼쪽 분류 표시
 const hasIO="IntersectionObserver" in window;
-const ioSec=hasIO?new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){const id=en.target.id;$$(".aisle button").forEach(x=>x.classList.toggle("on",x.dataset.jump===id))}})},{rootMargin:"-90px 0px -70% 0px"}):null;
+const ioSec=hasIO?new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){const id=en.target.id;$$(".aisle button").forEach(x=>{const on=x.dataset.jump===id;x.classList.toggle("on",on);if(on){const a=$("#aisle"),r=x.getBoundingClientRect(),ar=a.getBoundingClientRect();if(r.top<ar.top+30)a.scrollTop-=ar.top+30-r.top;else if(r.bottom>ar.bottom-10)a.scrollTop+=r.bottom-ar.bottom+10}})}})},{rootMargin:"-90px 0px -70% 0px"}):null;
 function observe(){
   if(!hasIO)return;
   ioSec.disconnect();$$(".catsec").forEach(s=>ioSec.observe(s));
 }
 {const css=(typeof ANIM_CSS!=="undefined"?ANIM_CSS:"")+(typeof B2CSS!=="undefined"?B2CSS:"");if(css){const st=document.createElement("style");st.textContent=css;document.head.appendChild(st)}}
+{const hd=$("header.top"),setH=()=>document.documentElement.style.setProperty("--hh",hd.offsetHeight+"px");setH();if("ResizeObserver" in window)new ResizeObserver(setH).observe(hd)}
 render();

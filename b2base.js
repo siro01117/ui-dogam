@@ -74,7 +74,12 @@ const K=(()=>{
 })();
 // 한 칸 그리기: 바탕 그라데이션 + 깊이 필터를 깔고 TH2 함수 결과를 얹는다 (defs 는 페이지에 한 번만 있어도 되지만 칸마다 자급)
 const B2DEFS=`<linearGradient id="b2bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6EEFF"/><stop offset=".55" stop-color="#F1EEFF"/><stop offset="1" stop-color="#FBF4FA"/></linearGradient><filter id="b2lift" x="-20%" y="-30%" width="140%" height="170%"><feDropShadow dx="0" dy="2.5" stdDeviation="3.5" flood-color="#4B5BA8" flood-opacity=".14"/></filter>`;
+// 둘레 여백: 내용을 가운데 기준으로 줄여 그린다. 화면 끝에 붙어야 뜻이 사는 그림(바텀시트 · 풀블리드 등)은 그대로
+const B2PAD=.86;
+const b2edge=m=>{for(const r of m.matchAll(/<rect x="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)){const x=+r[1],y=+r[2],w=+r[3],h=+r[4];
+  if(x<=.5||y<=.5||x+w>=159.5||y+h>=99.5)return true}return false};
 function thumb2(t,label){
   const k=TH2[t.c+":"+t.k]!==undefined?t.c+":"+t.k:t.k;const f=TH2[k];if(!f)return null;
-  return `<svg class="th b2" viewBox="0 0 160 100" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="${label||t.k} 예시"><defs>${B2DEFS}</defs><rect width="160" height="100" fill="url(#b2bg)"/>${f(K)}</svg>`;
+  let m=f(K);if(!b2edge(m))m=`<g transform="translate(${K.n2(80*(1-B2PAD))} ${K.n2(50*(1-B2PAD))}) scale(${B2PAD})">${m}</g>`;
+  return `<svg class="th b2" viewBox="0 0 160 100" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="${label||t.k} 예시"><defs>${B2DEFS}</defs><rect width="160" height="100" fill="url(#b2bg)"/>${m}</svg>`;
 }

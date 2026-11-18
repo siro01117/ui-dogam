@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>UI 이름 도감</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,10 +24,15 @@
 :root[data-theme="dark"][data-pal="violet"]{--acc:#9A82FF;--acc-fill:#5638D1;--acc-soft:rgba(154,130,255,.16)}
 :root[data-theme="dark"][data-pal="teal"]{--acc:#2CC4B9;--acc-fill:#0F7F78;--acc-soft:rgba(44,196,185,.16)}
 :root[data-theme="dark"][data-pal="lime"]{--acc:#D4F24A;--on-acc:#1C1C1E;--acc-fill:#8FA82A;--acc-soft:rgba(212,242,74,.16)}
+/* 예시 그림 속 포인트색은 어두운 화면에서도 밝은 화면 값으로 고정 (그림 바탕이 늘 밝아서) */
+.th,.thc{--acc:#2F6BFF;--on-acc:#FFFFFF;--acc-fill:#A9C2FF;--acc-soft:rgba(47,107,255,.12)}
+:root[data-pal="violet"] :is(.th,.thc){--acc:#6D4AFF;--acc-fill:#C2B4FF;--acc-soft:rgba(109,74,255,.12)}
+:root[data-pal="teal"] :is(.th,.thc){--acc:#0E9F96;--acc-fill:#8FDDD6;--acc-soft:rgba(14,159,150,.12)}
+:root[data-pal="lime"] :is(.th,.thc){--acc:#1C1C1E;--on-acc:#D4F24A;--acc-fill:#D4F24A;--acc-soft:rgba(212,242,74,.3)}
 /* END TOKENS */
 /* 레이아웃: 위 고정 머리 · 왼쪽 진열대(분류) · 가운데 상품 카드 · 오른쪽 장바구니(좁으면 서랍) */
 *{box-sizing:border-box}
-html{scroll-padding-top:76px}
+html{scroll-padding-top:calc(var(--hh,70px) + 6px)}
 body{background:var(--bg);color:var(--fg);margin:0;font-family:"Noto Sans KR","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -36,7 +45,7 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 .logo b{font-size:17px;letter-spacing:-.02em}
 .logo small{display:block;font-size:11.5px;color:var(--dim);font-weight:400;line-height:1.2}
 .search{flex:1 1 240px;min-width:0;position:relative;max-width:520px}
-.search input{width:100%;font:inherit;padding:10px 14px 10px 38px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--fg)}
+.search input{width:100%;font:inherit;padding:10px 34px 10px 38px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--fg)}
 .search input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft);background:var(--bg)}
 .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--dim)}
 .search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font:11px ui-monospace,Consolas,monospace;color:var(--dim);border:1px solid var(--line);border-radius:5px;padding:1px 5px;background:var(--bg)}
@@ -54,7 +63,7 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 
 .shell{max-width:1480px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:48px;padding-block:24px 80px}
 /* 왼쪽 진열대 */
-.aisle{position:sticky;top:84px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:4px}
+.aisle{position:sticky;top:calc(var(--hh,70px) + 14px);align-self:start;max-height:calc(100vh - var(--hh,70px) - 30px);overflow:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:4px}
 .aisle::-webkit-scrollbar{display:none}
 .aisle h3{font-size:11.5px;letter-spacing:.06em;color:var(--dim);margin:4px 0 10px 12px;font-weight:500}
 .aisle button{display:flex;justify-content:space-between;align-items:center;gap:8px;border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:11px;cursor:pointer;font-size:14px;color:var(--fg)}
@@ -85,7 +94,7 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 .card .pic .th{border-radius:0}
 .card .body{padding:0 6px;display:flex;flex-direction:column;gap:6px;flex:1}
 .card .head{display:flex;justify-content:space-between;gap:8px;align-items:start}
-.name{font-weight:700;min-width:0;letter-spacing:-.01em;font-size:16px}
+.name{font-weight:700;min-width:0;letter-spacing:-.01em;font-size:16px;word-break:keep-all;overflow-wrap:anywhere}
 .en{display:block;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:var(--dim);font-weight:400;letter-spacing:0}
 .desc{min-width:0;font-size:13.5px;color:color-mix(in srgb,var(--fg) 82%,var(--dim))}
 .sub{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;font-size:12px;align-items:center;color:var(--dim)}
@@ -181,7 +190,8 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 .dlg.view .bigdesc{margin:12px 6px 6px;font-size:21px;line-height:1.6;color:color-mix(in srgb,var(--fg) 80%,var(--dim))}
 .dlg.view .bighead .en{font-size:18px;margin-top:6px;color:color-mix(in srgb,var(--fg) 60%,var(--dim))}
 .dlg.view .bighead .fav{width:48px;height:48px}.dlg.view .bighead .fav svg{width:28px;height:28px}
-.dlg.view .dlgbox>.x{top:24px;right:24px;z-index:2;background:rgba(255,255,255,.85);border-radius:10px;width:34px;height:34px;display:grid;place-items:center;color:#12141A}
+.dlg.view .dlgbox{outline:none}
+.dlg.view .dlgbox>.x{position:sticky;top:6px;margin:0 6px -34px auto;z-index:2;background:rgba(255,255,255,.85);border-radius:10px;width:34px;height:34px;display:grid;place-items:center;color:#12141A}
 .dlg.view .nav{width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
 .dlg.view .nav:hover{background:rgba(255,255,255,.26)}
 .dlg.view .nav svg{width:22px;height:22px}
@@ -194,7 +204,7 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 @media (prefers-reduced-motion:reduce){.tip{transition:none}}
 /* 즐겨찾기 별 */
 .card .head{align-items:center}
-.fav{flex:0 0 auto;width:30px;height:30px;border:0;background:none;border-radius:9px;cursor:pointer;color:var(--faint);display:grid;place-items:center;padding:0}
+.fav{flex:0 0 auto;width:30px;height:30px;border:0;background:none;border-radius:9px;cursor:pointer;color:var(--dim);display:grid;place-items:center;padding:0}
 .fav svg{width:19px;height:19px}
 .fav:hover{color:var(--fg);background:var(--card)}
 .fav.on{color:var(--acc)}
@@ -221,19 +231,10 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 .card:hover .pb,.card:focus-within .pb,.pb:focus-visible{opacity:1}
 @media (hover:none){.pb{opacity:1}}
 /* 움직이는 그림: 평소엔 멈춘 완성 모습, 카드에 올리거나 크게 볼 때만 돈다 */
-#out .card:not(:hover):not(:focus-visible) .pic *,.simpic *{animation:none!important}
+#out .card:not(:hover):not(:focus-visible) .pic *{animation:none!important}
 .pb.mv{left:10px;top:10px;width:20px;height:20px;border-radius:50%;opacity:.85;cursor:default;pointer-events:none;color:var(--dim)}
 .pb.mv svg{width:10px;height:10px}
 .card:hover .pb.mv,.card:focus-visible .pb.mv{opacity:0}
-.sim{margin:24px 6px 6px;padding-top:20px;border-top:1px solid var(--line)}
-.sim h4{font-size:13.5px;color:var(--dim);font-weight:600;margin:0 0 12px}
-.simrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
-.simc{cursor:pointer;border-radius:14px;padding:8px;border:1px solid var(--line);transition:border-color .15s}
-.simc:hover,.simc:focus-visible{border-color:var(--acc);outline:none}
-.simpic{display:block;border-radius:9px;overflow:hidden}
-.simpic .th{border-radius:0;display:block;width:100%}
-.simc b{display:block;font-size:17px;margin:10px 4px 3px}
-.simc small{display:block;font-size:13.5px;color:var(--dim);margin:0 4px 4px;line-height:1.45}
 .lnk{border:0;background:none;padding:0;color:var(--fg);text-decoration:underline;text-underline-offset:2px;cursor:pointer;font-size:12px;margin-top:6px}
 .tpl{font:inherit;font-size:13px;border:1px dashed var(--faint);border-radius:10px;padding:7px 10px;background:var(--bg);color:var(--fg);cursor:pointer}
 .it{grid-template-columns:18px 64px minmax(0,1fr) auto;cursor:grab}
@@ -286,6 +287,7 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
   body:not([data-m="find"]) header.top .search{display:none}
   header.top .bar{justify-content:space-between}
   header.top .search{max-width:none;flex:1}
+  .search input{font-size:16px}
   .logo small{display:block}
   .shell{padding-bottom:96px}
   .grid{grid-template-columns:1fr 1fr!important;gap:14px 10px!important}
@@ -301,11 +303,10 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
   .dlg.view{display:block;padding:0;background:var(--bg);backdrop-filter:none}
   .dlg.view[hidden]{display:none}
   .dlg.view .dlgbox{border-radius:0;box-shadow:none;height:100dvh;max-height:100dvh;padding:12px 14px calc(28px + env(safe-area-inset-bottom,0px))}
-  .dlg.view .dlgbox>.x{top:20px;right:22px}
+  .dlg.view .dlgbox>.x{top:8px;margin-right:8px}
   .dlg.view .bighead .name{font-size:28px}
   .dlg.view .bighead .en{font-size:15.5px}
   .dlg.view .bigdesc{font-size:18px}
-  .simrow{grid-template-columns:1fr 1fr}
   .shell{grid-template-columns:minmax(0,1fr);gap:12px;padding-top:12px}
   .aisle{position:static;flex-direction:row;overflow-x:auto;max-height:none;gap:4px;padding-bottom:4px}
   .aisle h3,.aisle .tip,.aisle .sup{display:none}
@@ -314,7 +315,6 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
   .aisle button.on{color:var(--fg);font-weight:700}
   .grid{grid-template-columns:repeat(auto-fill,minmax(min(calc(var(--cw,180px) * .8),100%),1fr));gap:16px 12px}
   .dlg.view .nav{display:none}
-  .logo small{display:none}
   .pal{order:5}
   .dlgbox .cmp{grid-template-columns:1fr}
   .fbar{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}.fbar .chip{flex:0 0 auto}
@@ -332,30 +332,29 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
     </div>
     <label class="search" for="q">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="이름 · 영어 · 뜻 · 초성(ㅂㅌㅅㅌ)" autocomplete="off">
+      <input id="q" type="search" placeholder="이름 · 생김새(점 세 개) · 영어 · 초성" autocomplete="off">
       <kbd>/</kbd>
     </label>
     <div class="sp"></div>
-    <div class="pal" role="group" aria-label="포인트색 시안">
-      <button id="pBlue" data-pal="blue" style="background:#2F6BFF" title="A 파랑" aria-pressed="true"></button>
-      <button id="pViolet" data-pal="violet" style="background:#6D4AFF" title="B 보라" aria-pressed="false"></button>
-      <button id="pTeal" data-pal="teal" style="background:#0E9F96" title="C 청록" aria-pressed="false"></button>
-      <button id="pLime" data-pal="lime" style="background:#D4F24A" title="D 라임 (EZ.KIT)" aria-pressed="false"></button>
+    <div class="pal" role="group" aria-label="포인트색">
+      <button id="pBlue" data-pal="blue" style="background:#2F6BFF" title="파랑" aria-label="파랑" aria-pressed="true"></button>
+      <button id="pViolet" data-pal="violet" style="background:#6D4AFF" title="보라" aria-label="보라" aria-pressed="false"></button>
+      <button id="pTeal" data-pal="teal" style="background:#0E9F96" title="청록" aria-label="청록" aria-pressed="false"></button>
+      <button id="pLime" data-pal="lime" style="background:#D4F24A" title="라임" aria-label="라임" aria-pressed="false"></button>
     </div>
     <button class="ibtn" id="theme" aria-label="화면 밝기 전환"></button>
   </div>
 </header>
 
 <div class="shell gut">
-  <nav class="aisle" id="aisle" aria-label="진열대"></nav>
+  <nav class="aisle" id="aisle" aria-label="카테고리"></nav>
   <main>
     <div class="fbar" id="fbar" role="group" aria-label="걸러 보기"></div>
     <p class="meta" id="meta"></p>
     <div id="out"></div>
-    <p class="foot">그림에서 포인트색으로 칠한 부분이 그 이름이 가리키는 곳이에요. 출처: 인스타그램 @uxwoodytips 릴스 52개 + 표준 용어 보충.</p>
+    <p class="foot">그림에서 또렷하게 그린 부분이 그 이름이 가리키는 것이에요. 출처: 인스타그램 @uxwoodytips 릴스 52개 + 표준 용어 보충.</p>
   </main>
 </div>
-<div class="toast" id="toast" hidden></div>
 
 <script src="data.js"></script>
 <script src="alias.js"></script>
@@ -383,4 +382,6 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 <script src="b2_17.js"></script>
 <script src="b2_18.js"></script>
 <script src="b2_19.js"></script>
+<script src="b2_20.js"></script>
+<script src="b2_21.js"></script>
 <script src="app.js"></script>
