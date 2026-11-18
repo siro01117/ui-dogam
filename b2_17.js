@@ -4,7 +4,17 @@
 const C=K.C, W="#FFFFFF", n2=K.n2, INK="#12141A";
 const SERIF="Georgia,'Times New Roman',serif", SANS="Arial,Helvetica,sans-serif";
 const gbar=(x,y,w,h=4)=>K.rect(x,y,w,h,{f:"#D3D8E3",r:h/2});
-const p=(d,style)=>`<path d="${d}" style="${style}"/>`;
+const p=(d,style,cls="")=>`<path d="${d}" style="${style}"${cls?` class="${cls}"`:""}/>`;
+// 글자 용어 그림의 파란 표시 깜빡임(3.2초, 멈춘 모습은 켜진 상태): lit · lis = 글자의 일부(파랑 ↔ 글자색), mk · mq = 글자가 아닌 표시(투명도 1 ↔ 0 · 1 ↔ .25)
+B2CSS+=`.b2x17{animation-duration:3.2s;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+.b2a-n17lit{animation-name:b2a-n17lit}.b2a-n17lis{animation-name:b2a-n17lis}.b2a-n17mk{animation-name:b2a-n17mk}.b2a-n17mq{animation-name:b2a-n17mq}
+@keyframes b2a-n17lit{0%,42%,100%{fill:var(--acc)}50%,92%{fill:var(--off,#12141A)}}
+@keyframes b2a-n17lis{0%,42%,100%{stroke:var(--acc)}50%,92%{stroke:var(--off,#12141A)}}
+@keyframes b2a-n17mk{0%,42%,100%{opacity:1}50%,92%{opacity:0}}
+@keyframes b2a-n17mq{0%,42%,100%{opacity:1}50%,92%{opacity:.25}}
+`;
+const LIT="b2x17 b2a-n17lit", LIS="b2x17 b2a-n17lis";
+const MK=m=>`<g class="b2x17 b2a-n17mk">${m}</g>`, MQ=m=>`<g class="b2x17 b2a-n17mq">${m}</g>`;
 // 글꼴 · 기울기 · 굵기 보강(stroke)을 줄 수 있는 글자
 const T=(x,y,s,{size=9,fill=INK,w=700,a="start",ff="",fs="",st="",sw=0,o=1}={})=>
   `<text x="${n2(x)}" y="${n2(y)}" font-size="${size}" font-weight="${w}" text-anchor="${a}"${ff?` font-family="${ff}"`:""}${fs?` font-style="${fs}"`:""} style="fill:${fill}${sw?`;stroke:${st||fill};stroke-width:${sw}`:""}${o<1?`;opacity:${o}`:""}">${s}</text>`;
@@ -198,8 +208,8 @@ TH2["아토믹 디자인"]=K=>
 /* ───────── tp · 글자 용어 ───────── */
 // 글자 A H 를 직접 그린다(글꼴이 달라도 같은 모양). 획 끝 돌기(발)만 파랑. 굵은 획과 가는 획의 차이도 있다
 TH2["세리프"]=K=>{const cx=50,t=24,b=76,B=C.blue;
-  const foot=(x1,x2,d=0)=>p(`M${n2(x1-6)} ${b}V${b-2.6}Q${x1} ${b-2.6} ${n2(x1+d)} ${b-8.2}H${n2(x2+d)}Q${x2} ${b-2.6} ${n2(x2+6)} ${b-2.6}V${b}Z`,`fill:${B}`);
-  const head=(x1,x2)=>p(`M${n2(x1-6)} ${t}V${t+2.6}Q${x1} ${t+2.6} ${x1} ${t+8.2}H${x2}Q${x2} ${t+2.6} ${n2(x2+6)} ${t+2.6}V${t}Z`,`fill:${B}`);
+  const foot=(x1,x2,d=0)=>p(`M${n2(x1-6)} ${b}V${b-2.6}Q${x1} ${b-2.6} ${n2(x1+d)} ${b-8.2}H${n2(x2+d)}Q${x2} ${b-2.6} ${n2(x2+6)} ${b-2.6}V${b}Z`,`fill:${B}`,LIT);
+  const head=(x1,x2)=>p(`M${n2(x1-6)} ${t}V${t+2.6}Q${x1} ${t+2.6} ${x1} ${t+8.2}H${x2}Q${x2} ${t+2.6} ${n2(x2+6)} ${t+2.6}V${t}Z`,`fill:${B}`,LIT);
   return K.card(12,10,136,80,14)
   +p(`M${cx-5} ${t}h3.4L${cx-18.6} ${b}h-3.4Z`,`fill:${INK}`)+p(`M${cx-5} ${t}h10L${cx+22} ${b}h-10Z`,`fill:${INK}`)+K.rect(cx-14,57,21,2.8,{f:INK})
   +foot(cx-22,cx-18.6,2.6)+foot(cx+12,cx+22,-2.6)
@@ -217,21 +227,21 @@ TH2["산세리프"]=K=>{const cx=50,t=24,b=76,G="fill:none;stroke:#B4BBC8;stroke
 
 // 같은 글자, 글자 사이만 좁게 / 넓게
 TH2["자간"]=K=>K.card(16,10,128,80,14)
-  +["가","나","다","라"].map((s,i)=>K.txt(37+i*13,40,s,{size:15,fill:C.sub,w:700,a:"middle"})).join("")
+  +["가","나","다","라"].map((s,i)=>K.txt(39+i*13.5,40,s,{size:15,fill:C.sub,w:700,a:"middle"})).join("")
   +K.line(26,50,134,50,{s:C.line,sw:.6})
   +["가","나","다","라"].map((s,i)=>{const x=39+i*27;
-    return K.txt(x,75,s,{size:15,w:700,a:"middle"})+(i<3?K.rect(x+8.5,60,10,18,{f:C.blue,o:.2,r:1.5}):"")}).join("");
+    return K.txt(x,75,s,{size:15,w:700,a:"middle"})+(i<3?MK(K.rect(x+8.5,60,10,18,{f:C.blue,o:.2,r:1.5})):"")}).join("");
 
 // 같은 글, 줄 사이만 좁게 / 넓게
 TH2["행간"]=K=>{const L=["줄과 줄","사이의","간격"];
-  return K.card(12,14,62,72,12)+L.map((s,i)=>K.txt(22,42+i*9.5,s,{size:9.5,fill:C.sub,w:700})).join("")
-  +K.card(82,14,66,72,12)+L.map((s,i)=>K.txt(92,32.5+i*20,s,{size:9.5,w:700})+(i<2?K.rect(92,35.5+i*20,46,8.5,{f:C.blue,o:.2,r:1.5}):"")).join("")};
+  return K.card(12,14,62,72,12)+L.map((s,i)=>K.txt(22,41+i*10.5,s,{size:9.5,fill:C.sub,w:700})).join("")
+  +K.card(82,14,66,72,12)+L.map((s,i)=>K.txt(92,32.5+i*20,s,{size:9.5,w:700})+(i<2?MK(K.rect(92,35.5+i*20,46,8.5,{f:C.blue,o:.2,r:1.5})):"")).join("")};
 
 // A 와 V 처럼 특정 두 글자 사이만 따로 당겨 붙인다
 TH2["커닝"]=K=>{
   const pair=(cx,k,ink)=>{const xe=cx-1+k/2, vs=xe+1-k;
-    return T(xe,62,"A",{size:32,fill:ink,a:"end",ff:SANS})+T(vs,62,"V",{size:32,fill:ink,ff:SANS})
-    +`<path d="M${n2(xe-8.5)} 41H${n2(vs+.7)}L${n2(vs+8.5)} 60H${n2(xe-.7)}Z" style="fill:${C.blue};opacity:${k>0?.9:.22}"/>`};
+    return MK(`<path d="M${n2(xe-8.5)} 41H${n2(vs+.7)}L${n2(vs+8.5)} 60H${n2(xe-.7)}Z" style="fill:${C.blue};opacity:${k>0?.9:.22}"/>`)   // 사이 공간 표시는 글자 밑에 깐다
+    +T(xe,62,"A",{size:32,fill:ink,a:"end",ff:SANS})+T(vs,62,"V",{size:32,fill:ink,ff:SANS})};
   return K.card(10,18,66,64,12)+pair(43,-3,C.sub)+K.card(84,18,66,64,12)+pair(117,5.5,INK)};
 
 // 같은 글자, 획 두께만 단계로
@@ -242,15 +252,16 @@ TH2["굵기"]=K=>K.card(14,14,132,72,14)
 // 오른쪽으로 비스듬히 누운 글자
 TH2["이탤릭"]=K=>K.card(14,14,132,72,14)
   +K.line(47,24,47,76,{s:C.line,sw:1})+T(47,64,"Aa",{size:34,w:400,fill:C.mute,ff:SERIF,a:"middle"})
-  +K.line(104,76,119,24,{s:C.blue,sw:1.2,o:.5})+T(111,64,"Aa",{size:34,w:400,ff:SERIF,fs:"italic",a:"middle"});
+  +MQ(K.line(104,76,119,24,{s:C.blue,sw:1.2,o:.5}))+T(111,64,"Aa",{size:34,w:400,ff:SERIF,fs:"italic",a:"middle"});
 
 // 따로 쓰면 부딪히는 f 와 i 를 한 덩어리로 이은 글자
-TH2["리가처"]=K=>{const s=c=>`fill:none;stroke:${c};stroke-width:5.5;stroke-linecap:butt`;
+TH2["리가처"]=K=>{const s=c=>`fill:none;stroke:${c};stroke-width:5.5;stroke-linecap:butt`,g=m=>`<g transform="translate(2.5 2.5)">${m}</g>`;
   return K.card(12,16,62,68,12)
-  +p("M43 29.500c-8-3-13 0-13 8V70",s(C.sub))+p("M23 44h15",s(C.sub))+p("M54 44V70",s(C.sub))+K.circ(54,33.5,3.4,{f:C.sub})
+  +g(p("M43 29.500c-8-3-13 0-13 8V70",s(C.sub))+p("M23 44h15",s(C.sub))+p("M54 41.250V70",s(C.sub))+K.circ(54,33.5,3.4,{f:C.sub}))
   +K.card(86,16,62,68,12)
+  +g(p("M106 44h21",s(C.blue),LIS)   // 두 기둥 사이를 잇는 획만 파랑(양 끝은 기둥 밑에 숨는다)
   +p("M106 70V38c0-9 5-13 11-13c4 0 7 1.500 9 4.500",s(INK))+K.circ(127,31.5,4,{f:INK})+p("M127 41.250V70",s(INK))
-  +p("M98 44h8",s(INK))+p("M106 44h23.750",s(C.blue))};
+  +p("M98 44h8",s(INK)))};
 
 // 글꼴 파일 하나에서 굵기 · 너비를 막대로 자유롭게 조절
 TH2["가변 폰트"]=K=>{

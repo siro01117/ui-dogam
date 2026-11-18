@@ -37,16 +37,16 @@ TH2["설정 아이콘"]=big("q10gear");
 TH2["알림 아이콘"]=big("bell");
 TH2["홈 아이콘"]=big("home");
 TH2["프로필 아이콘"]=big("q10profile");
-TH2["더하기"]=big("plus");
+TH2["더하기 아이콘"]=big("plus");
 TH2["삭제 아이콘"]=big("q10trash",C.red);
-TH2["다운로드"]=big("download");
+TH2["다운로드 아이콘"]=big("download");
 TH2["필터 아이콘"]=big("filter");
 TH2["정보 아이콘"]=big("q10info",C.blue);
 TH2["경고 아이콘"]=big("q10warn",C.amber);
-TH2["셰브론"]=big("next");                                         // 열린 꺾쇠 ›
-TH2["캐럿"]=K=>K.card(46,16,68,68,20)+tri(80,48,11,C.ink);          // 채운 작은 삼각형 ▾
-TH2["잠금"]=big("q10lock");
-TH2["첨부"]=big("q10clip");
+TH2["셰브론 아이콘"]=big("next");                                         // 열린 꺾쇠 ›
+TH2["캐럿 아이콘"]=K=>K.card(46,16,68,68,20)+tri(80,48,11,C.ink);          // 채운 작은 삼각형 ▾
+TH2["잠금 아이콘"]=big("q10lock");
+TH2["첨부 아이콘"]=big("q10clip");
 
 /* ───────── 공유 ───────── */
 TH2["링크 미리보기 카드"]=K=>K.card(28,6,104,88,14)+photo(34,12,92,42,9)

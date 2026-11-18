@@ -36,7 +36,7 @@ TH2["댓글 아이콘"]=big("q13comment");
 TH2["보내기 아이콘"]=big("q13send",C.blue);
 TH2["카메라 아이콘"]=big("q13camera");
 TH2["마이크 아이콘"]=big("mic");
-TH2["위치 핀"]=big("q13pin",C.red);
+TH2["위치 핀 아이콘"]=big("q13pin",C.red);
 TH2["달력 아이콘"]=big("q13cal");
 TH2["시계 아이콘"]=big("q13clock");
 TH2["장바구니 아이콘"]=big("cart");
@@ -46,7 +46,7 @@ TH2["별 아이콘"]=K=>K.card(46,16,68,68,20)
 TH2["체크 아이콘"]=big("check",C.green);
 TH2["외부 링크 아이콘"]=big("q13ext");
 TH2["음소거 아이콘"]=big("q13mute");
-TH2["재생 · 일시정지"]=K=>two(
+TH2["재생 · 일시정지 아이콘"]=K=>two(
   (x,y)=>`<path d="M${x-8} ${y-12}L${x+12} ${y}L${x-8} ${y+12}z" style="fill:${C.ink};stroke:${C.ink};stroke-width:3"/>`,
   (x,y)=>K.rect(x-11,y-13,8,26,{f:C.ink,r:2.5})+K.rect(x+3,y-13,8,26,{f:C.ink,r:2.5}));
 TH2["전체 화면 아이콘"]=big("q13full");

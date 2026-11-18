@@ -209,16 +209,16 @@ kf("egf",2.8,"0%,8%{opacity:0;transform:none}14%{opacity:1;transform:none}52%{op
 
 /* ───────── 아이콘: 흰 면 위 큰 선 아이콘 하나 ───────── */
 const big=(n,color=C.ink)=>K=>K.card(46,16,68,68,20)+K.icon(n,80,50,40,color,2.2);
-TH2["하트"]=big("heart",C.red);
-TH2["북마크"]=big("bookmark");
-TH2["닫기"]=big("x");
-TH2["뒤로"]=big("back");
-TH2["새로고침"]=big("refresh");
-TH2["되돌리기"]=big("undo");
+TH2["하트 아이콘"]=big("heart",C.red);
+TH2["북마크 아이콘"]=big("bookmark");
+TH2["닫기 아이콘"]=big("x");
+TH2["뒤로 아이콘"]=big("back");
+TH2["새로고침 아이콘"]=big("refresh");
+TH2["되돌리기 아이콘"]=big("undo");
 TH2["검색 아이콘"]=big("search");
-TH2["확대"]=big("q4zoom");
-TH2["수정"]=big("edit");
-TH2["새 글"]=big("q4compose");
+TH2["확대 아이콘"]=big("q4zoom");
+TH2["수정 아이콘"]=big("edit");
+TH2["새 글 아이콘"]=big("q4compose");
 TH2["저장 아이콘"]=big("q4floppy");
 
 /* ───────── 공유 ───────── */
