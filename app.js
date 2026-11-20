@@ -115,7 +115,6 @@ function renderMobile(){
   document.body.dataset.m=S.mtab;
   $("#mplat").innerHTML=platSeg();
   $("#mtab").innerHTML=Object.keys(MT).map(k=>`<button data-mtab="${k}" aria-pressed="${S.mtab===k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round">${MT[k][1]}</svg>${MT[k][0]}${k==="fav"&&S.fav.length?`<i>${S.fav.length}</i>`:""}</button>`).join("");
-  $("#count").textContent=S.mtab==="fav"?`즐겨찾기 ${S.fav.length}개`:`${D.length}개 · 모양으로 이름 찾기`;
   const g0=S.grp;S.grp="all";S.only=S.mtab==="fav";if(S.mtab!=="find"&&S.q){S.q="";$("#q").value=""}
   let html="",m="";
   if(S.mtab==="cat"&&!S.mcat){
@@ -139,7 +138,6 @@ function render(){
   $$(".pal button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pal===S.pal));
   $$(".grp button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===S.grp&&!S.q&&!S.only));
   $$(".grp button span").forEach(s=>s.textContent=D.filter(t=>s.parentNode.dataset.g==="all"||t.g===s.parentNode.dataset.g).length);
-  $("#count").textContent=`${D.length}개 · 모양으로 이름 찾기`;
   renderFbar();
   if(isM()){renderMobile();return}
   const list=scope();
