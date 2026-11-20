@@ -1,7 +1,7 @@
 // UI 이름 도감 — 어떤 모양이 어떤 이름인지. 그림 + 이름 + 즐겨찾기 (data.js · thumbs.js · anim.js 다음에 읽는다)
-const ETC=["st","ty","tf","fn","ta","tp","ps","rs","ax","tl"];
+const ETC=["co","st","sy","ty","tf","fn","ta","tp","ps","dp","rs","dl","mt","ax","tl"];
 // 상위 묶음: 사이드바와 본문에서 구분선으로만 나눈다. 분류 순서도 이 순서를 따른다
-const SUP=[["parts","컴포넌트",["ct","in","nv","ov","ic","md","mp","gm"]],["screen","레이아웃 · 스크린",["ly","pg","sc","dv","sr","dt","sh"]],["act","인터랙션",["fb","mo","ge"]],["style","스타일 · 폰트",["st","ty","tf","fn","ta","tp"]],["know","UX",["ps","rs","ax","tl"]]];
+const SUP=[["parts","컴포넌트",["ct","in","nv","ov","ds","ld","dt","ic"]],["screen","화면 구성",["ly","pg","sc"]],["svc","서비스별",["sr","sh","ai","cm","md","mp","gm","dv"]],["act","인터랙션",["fb","mo","ge"]],["style","스타일 · 폰트",["co","st","sy","ty","tf","fn","ta","tp"]],["know","UX",["ps","dp","rs","dl","mt","ax","tl"]]];
 {const used=SUP.flatMap(s=>s[2]);Object.keys(CATS).forEach(c=>{if(!used.includes(c))SUP[SUP.length-1][2].push(c)})}
 const GRP={all:"전체",ui:"UI",etc:"기타"};
 const AL=typeof ALIAS!=="undefined"?ALIAS:{};
