@@ -276,6 +276,9 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
 .plb{position:absolute;top:8px;right:8px;font-size:11px;font-weight:600;line-height:1;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.9);color:#3A4150;box-shadow:0 1px 3px rgba(40,50,110,.12);pointer-events:none}
 .seg.plat{padding:2px;border-radius:10px}
 .seg.plat button{font-size:12.5px;padding:4px 10px}
+.card .nt{display:block;margin-top:6px;font-family:inherit;font-size:12.5px;font-weight:400;line-height:1.45;letter-spacing:0;color:var(--dim);white-space:normal;word-break:keep-all}
+.bignote{margin:12px 6px 4px;font-size:16px;line-height:1.6;color:var(--fg);background:color-mix(in srgb,var(--fg) 5%,transparent);border-radius:12px;padding:10px 14px}
+.bignote b{display:inline-block;font-size:13px;font-weight:600;color:var(--dim);margin-right:10px}
 .bigplat{margin:10px 6px 4px;font-size:16px;line-height:1.6;color:var(--dim)}
 .bigplat b{display:inline-block;font-size:13px;font-weight:600;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:1px 10px;margin-right:8px}
 .ctiles{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;margin-bottom:26px}
@@ -369,52 +372,53 @@ header.top{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--b
   </main>
 </div>
 
-<script src="data.js?v=1795175127"></script>
-<script src="alias.js?v=1795175127"></script>
-<script src="platform.js?v=1795175127"></script>
-<script src="thumbs.js?v=1795175127"></script>
+<script src="data.js?v=1795176134"></script>
+<script src="alias.js?v=1795176134"></script>
+<script src="platform.js?v=1795176134"></script>
+<script src="notes.js?v=1795176134"></script>
+<script src="thumbs.js?v=1795176134"></script>
 
 
-<script src="anim.js?v=1795175127"></script>
-<script src="b2base.js?v=1795175127"></script>
-<script src="b2_1.js?v=1795175127"></script>
-<script src="b2_2.js?v=1795175127"></script>
-<script src="b2_3.js?v=1795175127"></script>
-<script src="b2_4.js?v=1795175127"></script>
-<script src="b2_5.js?v=1795175127"></script>
-<script src="b2_6.js?v=1795175127"></script>
-<script src="b2_7.js?v=1795175127"></script>
-<script src="b2_8.js?v=1795175127"></script>
-<script src="b2_9.js?v=1795175127"></script>
-<script src="b2_10.js?v=1795175127"></script>
-<script src="b2_11.js?v=1795175127"></script>
-<script src="b2_12.js?v=1795175127"></script>
-<script src="b2_13.js?v=1795175127"></script>
-<script src="b2_14.js?v=1795175127"></script>
-<script src="b2_15.js?v=1795175127"></script>
-<script src="b2_16.js?v=1795175127"></script>
-<script src="b2_17.js?v=1795175127"></script>
-<script src="b2_18.js?v=1795175127"></script>
-<script src="b2_19.js?v=1795175127"></script>
-<script src="b2_20.js?v=1795175127"></script>
-<script src="b2_21.js?v=1795175127"></script>
-<script src="b2_22.js?v=1795175127"></script>
-<script src="b2_23.js?v=1795175127"></script>
-<script src="b2_24.js?v=1795175127"></script>
-<script src="b2_25.js?v=1795175127"></script>
-<script src="b2_26.js?v=1795175127"></script>
-<script src="b2_27.js?v=1795175127"></script>
-<script src="b2_28.js?v=1795175127"></script>
-<script src="b2_29.js?v=1795175127"></script>
-<script src="b2_30.js?v=1795175127"></script>
-<script src="b2_31.js?v=1795175127"></script>
-<script src="b2_32.js?v=1795175127"></script>
-<script src="b2_33.js?v=1795175127"></script>
-<script src="b2_34.js?v=1795175127"></script>
-<script src="b2_35.js?v=1795175127"></script>
-<script src="b2_36.js?v=1795175127"></script>
-<script src="b2_37.js?v=1795175127"></script>
-<script src="b2_38.js?v=1795175127"></script>
-<script src="b2_39.js?v=1795175127"></script>
-<script src="b2_40.js?v=1795175127"></script>
-<script src="app.js?v=1795175127"></script>
+<script src="anim.js?v=1795176134"></script>
+<script src="b2base.js?v=1795176134"></script>
+<script src="b2_1.js?v=1795176134"></script>
+<script src="b2_2.js?v=1795176134"></script>
+<script src="b2_3.js?v=1795176134"></script>
+<script src="b2_4.js?v=1795176134"></script>
+<script src="b2_5.js?v=1795176134"></script>
+<script src="b2_6.js?v=1795176134"></script>
+<script src="b2_7.js?v=1795176134"></script>
+<script src="b2_8.js?v=1795176134"></script>
+<script src="b2_9.js?v=1795176134"></script>
+<script src="b2_10.js?v=1795176134"></script>
+<script src="b2_11.js?v=1795176134"></script>
+<script src="b2_12.js?v=1795176134"></script>
+<script src="b2_13.js?v=1795176134"></script>
+<script src="b2_14.js?v=1795176134"></script>
+<script src="b2_15.js?v=1795176134"></script>
+<script src="b2_16.js?v=1795176134"></script>
+<script src="b2_17.js?v=1795176134"></script>
+<script src="b2_18.js?v=1795176134"></script>
+<script src="b2_19.js?v=1795176134"></script>
+<script src="b2_20.js?v=1795176134"></script>
+<script src="b2_21.js?v=1795176134"></script>
+<script src="b2_22.js?v=1795176134"></script>
+<script src="b2_23.js?v=1795176134"></script>
+<script src="b2_24.js?v=1795176134"></script>
+<script src="b2_25.js?v=1795176134"></script>
+<script src="b2_26.js?v=1795176134"></script>
+<script src="b2_27.js?v=1795176134"></script>
+<script src="b2_28.js?v=1795176134"></script>
+<script src="b2_29.js?v=1795176134"></script>
+<script src="b2_30.js?v=1795176134"></script>
+<script src="b2_31.js?v=1795176134"></script>
+<script src="b2_32.js?v=1795176134"></script>
+<script src="b2_33.js?v=1795176134"></script>
+<script src="b2_34.js?v=1795176134"></script>
+<script src="b2_35.js?v=1795176134"></script>
+<script src="b2_36.js?v=1795176134"></script>
+<script src="b2_37.js?v=1795176134"></script>
+<script src="b2_38.js?v=1795176134"></script>
+<script src="b2_39.js?v=1795176134"></script>
+<script src="b2_40.js?v=1795176134"></script>
+<script src="app.js?v=1795176134"></script>

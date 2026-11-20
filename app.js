@@ -17,6 +17,9 @@ const byKey={};D.forEach(t=>byKey[t.key]=t);
 {const P=typeof PLAT!=="undefined"?PLAT:{m:[],w:[],diff:{}},M=new Set(P.m),W=new Set(P.w),has=(set,t)=>set.has(t.c+":"+t.k)||(t.key===t.k&&set.has(t.k));
  D.forEach(t=>{t.pl=has(M,t)?"m":has(W,t)?"w":"b";t.pd=t.key===t.k?P.diff[t.k]||"":""});}
 const PLN={m:"모바일",w:"웹"};
+// 이름을 정하는 기준 한 줄: nk = p(자리 · 역할로 갈림) · v(모습이 여러 가지) · c(개념 · 작동 방식), nt = 한 줄
+{const N=typeof NOTE!=="undefined"?NOTE:{};D.forEach(t=>{const n=N[t.c+":"+t.k]||(t.key===t.k?N[t.k]:null);if(n){t.nk=n[0];t.nt=n[1]}});}
+const NKN={p:"자리 · 역할이 기준",v:"모습은 여러 가지",c:"모양이 아닌 개념"};
 
 const S={grp:"all",q:"",pal:"blue",theme:"light",fav:[],only:false,zoom:1,plat:"all",mtab:"cat",mcat:null};
 const ZOOM=[140,180,240,320,420];   // 카드 최소 폭(px): 작게 → 크게
@@ -82,7 +85,7 @@ D.forEach(t=>{
 const picHTML=t=>t.pic;
 const card=t=>`<article class="card${isFav(t.key)?" on":""}" id="${t.id}" data-key="${esc(t.key)}" tabindex="0" role="button" aria-label="${esc(t.k)} 크게 보기">
   <div class="pic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<span class="pb mv" aria-hidden="true">${MOVE}</span>`:""}${t.pl!=="b"?`<span class="plb">${PLN[t.pl]}</span>`:""}</div>
-  <div class="body"><div class="head"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div></div></article>`;
+  <div class="body"><div class="head"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span>${t.nt?`<span class="nt">${esc(t.nt)}</span>`:""}</div>${favBtn(t)}</div></div></article>`;
 
 // 지금 목록에 있는 분류만 상위 묶음별로
 function groups(list){
@@ -183,7 +186,7 @@ function openView(k){
   const first=$("#dlg").hidden;
   if(first){lastFocus=document.activeElement;try{history.pushState({v:1},"")}catch(e){}}
   viewKey=k;
-  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div><div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}${t.g==="ui"?`<p class="bigplat"><b>${t.pl==="b"?"모바일 · 웹 공용":PLN[t.pl]+"에서 주로 써요"}</b>${t.pd?esc(t.pd):""}</p>`:""}`;
+  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div><div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}${t.nt?`<p class="bignote"><b>${NKN[t.nk]}</b>${esc(t.nt)}</p>`:""}${t.g==="ui"?`<p class="bigplat"><b>${t.pl==="b"?"모바일 · 웹 공용":PLN[t.pl]+"에서 주로 써요"}</b>${t.pd?esc(t.pd):""}</p>`:""}`;
   fitThc($("#dlgBody"));
   $("#dlg").hidden=false;document.body.style.overflow="hidden";
   if(first){$(".dlgbox").scrollTop=0;$(".dlgbox").focus()}
