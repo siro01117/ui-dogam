@@ -73,20 +73,27 @@ function scope(){
 const FAVI='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 3.2l2.6 5.5 6 .7-4.5 4.1 1.2 5.9L12 16.5l-5.3 2.9 1.2-5.9-4.5-4.1 6-.7z"/></svg>';
 const MOVE='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
 const REPLAY='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>';
-const favBtn=t=>`<button class="fav${isFav(t.key)?" on":""}" data-fav="${esc(t.key)}" aria-pressed="${isFav(t.key)}" aria-label="${esc(t.k)} 즐겨찾기" title="즐겨찾기">${FAVI.replace("<svg",`<svg fill="${isFav(t.key)?"currentColor":"none"}"`)}</button>`;
+// 카드마다 붙는 별은 모양을 한 번만 정의해 두고 가리킨다(카드 1,400장 × 별 SVG 가 목록 HTML 의 40% 였다)
+document.body.insertAdjacentHTML("afterbegin",`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><path id="dg-fav" d="M12 3.2l2.6 5.5 6 .7-4.5 4.1 1.2 5.9L12 16.5l-5.3 2.9 1.2-5.9-4.5-4.1 6-.7z"/></defs></svg>`);
+const FAVU='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><use href="#dg-fav"/></svg>';
+const favBtn=t=>`<button class="fav${isFav(t.key)?" on":""}" data-fav="${esc(t.key)}" aria-pressed="${isFav(t.key)}" aria-label="${esc(t.k)} 즐겨찾기" title="즐겨찾기">${FAVU.replace("<svg",`<svg fill="${isFav(t.key)?"currentColor":"none"}"`)}</button>`;
 // 그림: 새 B2 그림(TH2)이 있으면 그것, 없으면 옛 움직이는 그림 · 옛 그림. 한 번 만들어 둔다
 const HAS_B2=typeof thumb2==="function";
 // 같은 id 가 여러 그림에 있으면 문서의 첫 정의를 쓴다 → 늘 보이는 정의 하나를 맨 앞에 둔다(숨겨진 카드 때문에 바탕이 사라지지 않게)
 if(HAS_B2)document.body.insertAdjacentHTML("afterbegin",`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${B2DEFS}</defs></svg>`);
+// 그림마다 들어 있던 같은 바탕 정의(B2DEFS)는 위 한 벌이 대신한다(어차피 문서의 첫 정의를 쓴다) → 그림 1,400개 × 정의 노드가 빠진다
+const B2D=HAS_B2?"<defs>"+B2DEFS+"</defs>":null;
 D.forEach(t=>{
   const b2=HAS_B2?thumb2(t,esc(t.k)):null;
-  if(b2){t.pic=b2;t.anim=b2.includes("b2a-")}
+  if(b2){t.pic=b2.replace(B2D,"");t.anim=b2.includes("b2a-")}
   else if(t.anim){t.pic=`<svg class="th" viewBox="0 0 160 100" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="${esc(t.k)} 예시"><defs><filter id="blur"><feGaussianBlur stdDeviation="2.2"/></filter></defs>${t.anim}</svg>`;t.anim=true}
   else t.pic=thumbHTML(t);
 });
 const picHTML=t=>t.pic;
+const byId={};D.forEach(t=>byId[t.id]=t);
+// 카드 그림은 같은 16:10 빈 틀(.th)로 먼저 두고, 화면 가까이 오면 진짜 그림으로 바꾼다(fitThc 가 붙인다)
 const card=t=>`<article class="card${isFav(t.key)?" on":""}" id="${t.id}" data-key="${esc(t.key)}" tabindex="0" role="button" aria-label="${esc(t.k)} 크게 보기">
-  <div class="pic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<span class="pb mv" aria-hidden="true">${MOVE}</span>`:""}${t.pl!=="b"?`<span class="plb">${PLN[t.pl]}</span>`:""}</div>
+  <div class="pic${t.anim?" anim":""}">${t.pic?`<i class="th lz" data-lz="${t.id}" aria-hidden="true"></i>`:""}${t.anim?`<span class="pb mv" aria-hidden="true">${MOVE}</span>`:""}${t.pl!=="b"?`<span class="plb">${PLN[t.pl]}</span>`:""}</div>
   <div class="body"><div class="head"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span>${t.nt?`<span class="nt">${esc(t.nt)}</span>`:""}</div>${favBtn(t)}</div></div></article>`;
 
 // 지금 목록에 있는 분류만 상위 묶음별로
@@ -163,7 +170,27 @@ function render(){
 }
 // 스타일 견본(HTML)은 270px 폭 기준으로 만들어져 있어 그림 폭에 맞춰 통째로 키운다
 const roThc="ResizeObserver" in window?new ResizeObserver(es=>es.forEach(e=>e.target.style.setProperty("--z",(e.contentRect.width/270).toFixed(3)))):null;
-function fitThc(root){if(roThc)root.querySelectorAll(".thc").forEach(el=>roThc.observe(el))}
+const fitThc0=root=>{if(roThc)root.querySelectorAll(".thc").forEach(el=>roThc.observe(el))};
+const putPic=el=>{const t=byId[el.dataset.lz],p=el.parentNode;if(!t||!p)return;el.outerHTML=t.pic;fitThc0(p)};
+// 카드 그림은 화면 가까이(위아래 900px) 오면 붙인다. 지켜보는 것은 카드 12장 묶음의 처음 · 끝 카드뿐
+// (카드 1,400장을 다 지켜보면 스크롤 프레임마다 교차 계산이 수백 ms 든다. 모바일은 화면 밖 카드를 content-visibility 로 건너뛰므로 안쪽 틀 말고 카드를 본다)
+// 화면 안에 든 것은 바로, 미리 붙이는 화면 밖 것은 한 프레임에 6ms 씩 나눠 붙인다
+const picQ=[];let pumpOn=false;
+function pump(){const t0=performance.now();while(picQ.length&&performance.now()-t0<6)putPic(picQ.shift());if(picQ.length)requestAnimationFrame(pump);else pumpOn=false}
+const lzChunk=new Map();
+const ioPic="IntersectionObserver" in window?new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const ch=lzChunk.get(e.target);if(!ch||ch.done)return;ch.done=true;
+  ch.cards.forEach(c=>{lzChunk.delete(c);ioPic.unobserve(c)});
+  ch.lz.forEach(el=>{const r=(el.closest(".card")||el).getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)putPic(el);else picQ.push(el)});
+  if(picQ.length&&!pumpOn){pumpOn=true;requestAnimationFrame(pump)}}),{rootMargin:"900px 0px"}):null;
+function fitThc(root){
+  if(root.id==="out"&&ioPic){ioPic.disconnect();lzChunk.clear();picQ.length=0}   // 목록을 새로 그리면 옛 틀은 버린다
+  const lz=[...root.querySelectorAll(".lz")];
+  if(!ioPic)lz.forEach(putPic);
+  else for(let i=0;i<lz.length;){const g=lz[i].closest(".grid");let j=i;while(j<lz.length&&j-i<12&&lz[j].closest(".grid")===g)j++;
+    const part=lz.slice(i,j),cards=[...new Set([part[0],part[part.length-1]].map(el=>el.closest(".card")||el))],ch={lz:part,cards,done:false};
+    cards.forEach(c=>{lzChunk.set(c,ch);ioPic.observe(c)});i=j}
+  fitThc0(root);
+}
 function toggleFav(k){
   const i=S.fav.indexOf(k);if(i<0)S.fav.push(k);else S.fav.splice(i,1);
   save("fav",JSON.stringify(S.fav));
