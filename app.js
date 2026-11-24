@@ -22,7 +22,7 @@ const PLN={m:"모바일",w:"웹"};
 const NKN={p:"자리 · 역할이 기준",v:"모습은 여러 가지",c:"모양이 아닌 개념"};
 
 const S={grp:"all",q:"",pal:"blue",theme:"light",fav:[],only:false,zoom:1,plat:"all",speed:1,mtab:"cat",mcat:null};
-const SPEEDS=[0.25,0.5,1,2];   // 그림 움직임 배속
+const SPEEDS=[0.5,1,2], BASE=2;   // 그림 움직임 배속(1× = 원래 속도의 2배)
 const ZOOM=[140,180,240,320,420];   // 카드 최소 폭(px): 작게 → 크게
 const store={get(k){try{return localStorage.getItem("dogam-"+k)}catch(e){return null}},set(k,v){try{localStorage.setItem("dogam-"+k,v)}catch(e){}}};
 const save=(k,v)=>{store.set(k,v);window.dogam.onChange&&window.dogam.onChange(k,v)};
@@ -110,8 +110,9 @@ const platSeg=()=>`<div class="seg plat" role="group" aria-label="모바일 · �
 const speedSeg=()=>`<div class="seg spd" role="group" aria-label="움직임 속도" title="움직이는 그림 속도">${SPEEDS.map(v=>`<button data-spd="${v}" aria-pressed="${S.speed===v}">${v}×</button>`).join("")}</div>`;
 // 그림 안 애니메이션에만 배속을 건다(마우스를 올릴 때마다 새로 시작하므로 시작할 때마다 다시 건다)
 const inPic=a=>{const t=a.effect&&a.effect.target;return t&&t.closest&&t.closest(".pic,.bigpic")};
-function applySpeed(){try{document.getAnimations().forEach(a=>{if(a.playbackRate!==S.speed&&inPic(a))a.playbackRate=S.speed})}catch(e){}}
-["pointerover","focusin"].forEach(ev=>document.addEventListener(ev,()=>requestAnimationFrame(applySpeed),true));
+const speedSoon=()=>{applySpeed();setTimeout(applySpeed,0)};
+function applySpeed(){try{document.getAnimations().forEach(a=>{const r=S.speed*BASE;if(a.playbackRate!==r&&inPic(a))a.playbackRate=r})}catch(e){}}
+["pointerover","focusin"].forEach(ev=>document.addEventListener(ev,speedSoon,true));
 document.addEventListener("animationstart",applySpeed,true);
 function renderFbar(){
   $("#fbar").innerHTML=`<button class="chip only" data-only="1" aria-pressed="${S.only}">${FAVI.replace("<svg",`<svg width="14" height="14" fill="${S.only?"currentColor":"none"}"`)}즐겨찾기만<span>${S.fav.length}</span></button>${platSeg()}${speedSeg()}<span class="sp"></span><div class="zoom" role="group" aria-label="카드 크기"><button data-z="-1" ${S.zoom?"":"disabled"} aria-label="작게" title="작게 ( - )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12"/></svg></button><span>${S.zoom+1}/${ZOOM.length}</span><button data-z="1" ${S.zoom<ZOOM.length-1?"":"disabled"} aria-label="크게" title="크게 ( + )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12M12 6v12"/></svg></button></div>`;
@@ -195,7 +196,7 @@ function openView(k){
   if(first){lastFocus=document.activeElement;try{history.pushState({v:1},"")}catch(e){}}
   viewKey=k;
   $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div>${t.anim?`<div class="bigspd">${speedSeg()}</div>`:""}<div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}${t.nt?`<p class="bignote"><b>${NKN[t.nk]}</b>${esc(t.nt)}</p>`:""}${t.g==="ui"?`<p class="bigplat"><b>${t.pl==="b"?"모바일 · 웹 공용":PLN[t.pl]+"에서 주로 써요"}</b>${t.pd?esc(t.pd):""}</p>`:""}`;
-  fitThc($("#dlgBody"));requestAnimationFrame(applySpeed);
+  fitThc($("#dlgBody"));speedSoon();
   $("#dlg").hidden=false;document.body.style.overflow="hidden";
   if(first){$(".dlgbox").scrollTop=0;$(".dlgbox").focus()}
 }
@@ -257,7 +258,7 @@ document.addEventListener("click",e=>{
   if(d.g){S.grp=d.g;S.q="";S.only=false;$("#q").value="";render();window.scrollTo({top:0});return}
   if(d.pal){S.pal=d.pal;save("pal",S.pal);render();return}
   if(d.jump){const el=document.getElementById(d.jump);el&&el.scrollIntoView({behavior:"smooth",block:"start"});return}
-  if(d.replay){const s=b.parentNode.querySelector("svg");s.replaceWith(s.cloneNode(true));requestAnimationFrame(applySpeed);return}
+  if(d.replay){const s=b.parentNode.querySelector("svg");s.replaceWith(s.cloneNode(true));speedSoon();return}
   if(b.id==="theme"){S.theme=isDark()?"light":"dark";save("theme",S.theme);applyTheme();return}
 });
 {let qt=null;$("#q").addEventListener("input",e=>{clearTimeout(qt);const v=e.target.value.trim();qt=setTimeout(()=>{S.q=v;render();scrollTo(0,0)},130)})}
