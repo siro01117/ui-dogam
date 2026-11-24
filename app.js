@@ -151,6 +151,7 @@ function render(){
   $$(".grp button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===S.grp&&!S.q&&!S.only));
   $$(".grp button span").forEach(s=>s.textContent=D.filter(t=>s.parentNode.dataset.g==="all"||t.g===s.parentNode.dataset.g).length);
   renderFbar();
+  if(window.dogam.view&&window.dogam.view())return;   // 질문으로 찾기(finder.js) 화면이면 거기서 그린다
   if(isM()){renderMobile();return}
   const list=scope();
   const gs=S.q?[]:groups(list);
