@@ -21,18 +21,20 @@ const PLN={m:"모바일",w:"웹"};
 {const N=typeof NOTE!=="undefined"?NOTE:{};D.forEach(t=>{const n=N[t.c+":"+t.k]||(t.key===t.k?N[t.k]:null);if(n){t.nk=n[0];t.nt=n[1]}});}
 const NKN={p:"자리 · 역할이 기준",v:"모습은 여러 가지",c:"모양이 아닌 개념"};
 
-const S={grp:"all",q:"",pal:"blue",theme:"light",fav:[],only:false,zoom:1,plat:"all",mtab:"cat",mcat:null};
+const S={grp:"all",q:"",pal:"blue",theme:"light",fav:[],only:false,zoom:1,plat:"all",speed:1,mtab:"cat",mcat:null};
+const SPEEDS=[0.25,0.5,1,2];   // 그림 움직임 배속
 const ZOOM=[140,180,240,320,420];   // 카드 최소 폭(px): 작게 → 크게
 const store={get(k){try{return localStorage.getItem("dogam-"+k)}catch(e){return null}},set(k,v){try{localStorage.setItem("dogam-"+k,v)}catch(e){}}};
 const save=(k,v)=>{store.set(k,v);window.dogam.onChange&&window.dogam.onChange(k,v)};
 function applySaved(o){
   if(o.pal)S.pal=o.pal;if(o.theme==="light"||o.theme==="dark")S.theme=o.theme;
   if(o.plat==="m"||o.plat==="w"||o.plat==="all")S.plat=o.plat;
+  if(o.speed!==undefined&&o.speed!==null&&SPEEDS.includes(+o.speed))S.speed=+o.speed;
   if(o.zoom!==undefined&&o.zoom!==null&&ZOOM[+o.zoom])S.zoom=+o.zoom;
   if(o.fav){try{const a=JSON.parse(o.fav);if(Array.isArray(a))S.fav=a.filter(k=>byKey[k])}catch(e){}}
 }
 window.dogam={onChange:null,apply(o){applySaved(o);render()}};
-applySaved({pal:store.get("pal"),theme:store.get("theme"),fav:store.get("fav"),zoom:store.get("zoom"),plat:store.get("plat")});
+applySaved({pal:store.get("pal"),theme:store.get("theme"),fav:store.get("fav"),zoom:store.get("zoom"),plat:store.get("plat"),speed:store.get("speed")});
 
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
@@ -105,8 +107,14 @@ function applyTheme(){
   b.innerHTML=dark?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>';
 }
 const platSeg=()=>`<div class="seg plat" role="group" aria-label="모바일 · 웹">${[["all","전체"],["m","모바일"],["w","웹"]].map(([k,n])=>`<button data-plat="${k}" aria-pressed="${S.plat===k}">${n}</button>`).join("")}</div>`;
+const speedSeg=()=>`<div class="seg spd" role="group" aria-label="움직임 속도" title="움직이는 그림 속도">${SPEEDS.map(v=>`<button data-spd="${v}" aria-pressed="${S.speed===v}">${v}×</button>`).join("")}</div>`;
+// 그림 안 애니메이션에만 배속을 건다(마우스를 올릴 때마다 새로 시작하므로 시작할 때마다 다시 건다)
+const inPic=a=>{const t=a.effect&&a.effect.target;return t&&t.closest&&t.closest(".pic,.bigpic")};
+function applySpeed(){try{document.getAnimations().forEach(a=>{if(a.playbackRate!==S.speed&&inPic(a))a.playbackRate=S.speed})}catch(e){}}
+["pointerover","focusin"].forEach(ev=>document.addEventListener(ev,()=>requestAnimationFrame(applySpeed),true));
+document.addEventListener("animationstart",applySpeed,true);
 function renderFbar(){
-  $("#fbar").innerHTML=`<button class="chip only" data-only="1" aria-pressed="${S.only}">${FAVI.replace("<svg",`<svg width="14" height="14" fill="${S.only?"currentColor":"none"}"`)}즐겨찾기만<span>${S.fav.length}</span></button>${platSeg()}<span class="sp"></span><div class="zoom" role="group" aria-label="카드 크기"><button data-z="-1" ${S.zoom?"":"disabled"} aria-label="작게" title="작게 ( - )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12"/></svg></button><span>${S.zoom+1}/${ZOOM.length}</span><button data-z="1" ${S.zoom<ZOOM.length-1?"":"disabled"} aria-label="크게" title="크게 ( + )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12M12 6v12"/></svg></button></div>`;
+  $("#fbar").innerHTML=`<button class="chip only" data-only="1" aria-pressed="${S.only}">${FAVI.replace("<svg",`<svg width="14" height="14" fill="${S.only?"currentColor":"none"}"`)}즐겨찾기만<span>${S.fav.length}</span></button>${platSeg()}${speedSeg()}<span class="sp"></span><div class="zoom" role="group" aria-label="카드 크기"><button data-z="-1" ${S.zoom?"":"disabled"} aria-label="작게" title="작게 ( - )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12"/></svg></button><span>${S.zoom+1}/${ZOOM.length}</span><button data-z="1" ${S.zoom<ZOOM.length-1?"":"disabled"} aria-label="크게" title="크게 ( + )"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 12h12M12 6v12"/></svg></button></div>`;
   document.documentElement.style.setProperty("--cw",ZOOM[S.zoom]+"px");
 }
 // 좁은 화면(모바일): 아래 탭 바 = 분류 / 찾기 / 즐겨찾기. 분류 탭은 분류 목록 → 그 분류 카드
@@ -186,8 +194,8 @@ function openView(k){
   const first=$("#dlg").hidden;
   if(first){lastFocus=document.activeElement;try{history.pushState({v:1},"")}catch(e){}}
   viewKey=k;
-  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div><div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}${t.nt?`<p class="bignote"><b>${NKN[t.nk]}</b>${esc(t.nt)}</p>`:""}${t.g==="ui"?`<p class="bigplat"><b>${t.pl==="b"?"모바일 · 웹 공용":PLN[t.pl]+"에서 주로 써요"}</b>${t.pd?esc(t.pd):""}</p>`:""}`;
-  fitThc($("#dlgBody"));
+  $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div>${t.anim?`<div class="bigspd">${speedSeg()}</div>`:""}<div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}${t.nt?`<p class="bignote"><b>${NKN[t.nk]}</b>${esc(t.nt)}</p>`:""}${t.g==="ui"?`<p class="bigplat"><b>${t.pl==="b"?"모바일 · 웹 공용":PLN[t.pl]+"에서 주로 써요"}</b>${t.pd?esc(t.pd):""}</p>`:""}`;
+  fitThc($("#dlgBody"));requestAnimationFrame(applySpeed);
   $("#dlg").hidden=false;document.body.style.overflow="hidden";
   if(first){$(".dlgbox").scrollTop=0;$(".dlgbox").focus()}
 }
@@ -243,12 +251,13 @@ document.addEventListener("click",e=>{
   if(d.step){stepView(+d.step);return}
   if(b.id==="dlgX"){closeView();return}
   if(d.plat){S.plat=d.plat;save("plat",S.plat);render();return}
+  if(d.spd){S.speed=+d.spd;save("speed",S.speed);$$(".seg.spd button").forEach(x=>x.setAttribute("aria-pressed",String(+x.dataset.spd===S.speed)));applySpeed();return}
   if(d.z){setZoom(S.zoom+(+d.z));return}
   if(d.only){S.only=!S.only;render();window.scrollTo({top:0});return}
   if(d.g){S.grp=d.g;S.q="";S.only=false;$("#q").value="";render();window.scrollTo({top:0});return}
   if(d.pal){S.pal=d.pal;save("pal",S.pal);render();return}
   if(d.jump){const el=document.getElementById(d.jump);el&&el.scrollIntoView({behavior:"smooth",block:"start"});return}
-  if(d.replay){const s=b.parentNode.querySelector("svg");s.replaceWith(s.cloneNode(true));return}
+  if(d.replay){const s=b.parentNode.querySelector("svg");s.replaceWith(s.cloneNode(true));requestAnimationFrame(applySpeed);return}
   if(b.id==="theme"){S.theme=isDark()?"light":"dark";save("theme",S.theme);applyTheme();return}
 });
 {let qt=null;$("#q").addEventListener("input",e=>{clearTimeout(qt);const v=e.target.value.trim();qt=setTimeout(()=>{S.q=v;render();scrollTo(0,0)},130)})}
