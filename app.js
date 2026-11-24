@@ -196,8 +196,8 @@ function openView(k){
   if(first){lastFocus=document.activeElement;try{history.pushState({v:1},"")}catch(e){}}
   viewKey=k;
   $("#dlgBody").innerHTML=`<div class="bigpic${t.anim?" anim":""}">${picHTML(t)}${t.anim?`<button class="pb rp" data-replay="1" title="다시 재생" aria-label="다시 재생">${REPLAY}</button>`:""}</div>${t.anim?`<div class="bigspd">${speedSeg()}</div>`:""}<div class="bighead"><div class="name">${esc(t.k)}<span class="en">${esc(t.e)}</span></div>${favBtn(t)}</div>${t.d?`<p class="bigdesc">${esc(t.d)}</p>`:""}${t.nt?`<p class="bignote"><b>${NKN[t.nk]}</b>${esc(t.nt)}</p>`:""}${t.g==="ui"?`<p class="bigplat"><b>${t.pl==="b"?"모바일 · 웹 공용":PLN[t.pl]+"에서 주로 써요"}</b>${t.pd?esc(t.pd):""}</p>`:""}`;
-  fitThc($("#dlgBody"));speedSoon();
-  $("#dlg").hidden=false;document.body.style.overflow="hidden";
+  fitThc($("#dlgBody"));
+  $("#dlg").hidden=false;document.body.style.overflow="hidden";speedSoon();
   if(first){$(".dlgbox").scrollTop=0;$(".dlgbox").focus()}
 }
 function closeView(fromPop){
